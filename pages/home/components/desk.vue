@@ -10,29 +10,20 @@
 					<uni-data-select v-model="select" :localdata="selects" @change="change"></uni-data-select>
 				</view> -->
 			</view>
-			<view class="tables">
-				<view class="table mr15 mb15 bf pt15 f-y-bt"
-					:class="v.state==1?'b23 cf':v.state==2?'bb3 cf':v.state==4?'bdb cf':v.state==3?'b2e cf':'bf c0'"
-					v-for="(v,i) in tabelList" :key="i" @click="clickItem(v,i)">
-					<view class="f-bt">
-						<view class="p-0-15 f16 mb15 t-o-e">{{v.name}}</view>
-						<view class="p-0-15 sm f14 mr10" v-if="v.scan==1"
-							:style="{color:v.state==2?'#FF4C54':v.state==1?'#3E9949':v.state==3?'#2979ff':v.state==4?'#DC6523':''}">{{$t('desk.scan_code')}}</view>
-					</view>
-					<view v-if="v.state==1" class="p-0-15 f16 mb15">{{$t('desk.pending_order')}}</view>
-					<view v-else-if="v.order && v.order.money" class="p-0-15 f16 mb15">฿{{v.order.money}}</view>
-					<view class="p10 f-x-bt f14 bottom" style="background: rgba(#000,.3)">
-						<view class="f-y-c">
-							<text class="iconfont icon-wode" style="font-size: 14px;"></text>
-							{{ v.people || 0 }}/{{v.type.max}}
-						</view>
-						<view v-if="v.minutes" class="nowrap f-y-c">
-							<text class="iconfont icon-shalou" style="font-size: 14px;"></text>
-							{{v.minutes}}{{$t('desk.minutes')}}
-						</view>
-					</view>
-				</view>
-			</view>
+			<!-- 使用虚拟滚动优化大列表渲染 -->
+			<virtual-table-list
+				:tables="tabelList"
+				:container-height="'calc(100vh - 200px)'"
+				:table-item-height="160"
+				:visible-count="8"
+				:buffer-size="3"
+				:selected-table-id="selectedTableId"
+				:loading="tableLoading"
+				@tableClick="clickItem"
+				@scroll="handleTableScroll"
+				@loadMore="handleLoadMore"
+				ref="virtualTableList"
+			/>
 			<view class="p-15-13 f-x-bt bs6 bf kinds">
 				<view :class="kind==index?'isKind wei6':''" class="kind f16 tac" v-for="(item,index) in nav"
 					:key="index" @click="changeKind(item,index)">
@@ -55,10 +46,12 @@
 	} from 'vuex'
 	// import cash from '@/components/pay/cash.vue';
 	import share from '../../table/components/share.vue';
+	import VirtualTableList from '@/components/virtual-scroll/virtual-table-list.vue';
 	export default ({
 		components: {
 			// cash,
 			share,
+			VirtualTableList,
 		},
 		data() {
 			return {
@@ -112,6 +105,9 @@
 				tabelConunt: {},
 				form: {},
 				value: 0,
+				// 虚拟滚动相关
+				selectedTableId: null,
+				tableLoading: false,
 			}
 		},
 		computed: {
@@ -120,17 +116,52 @@
 			}),
 		},
 		destroyed() {
-			clearInterval(this.dsq)
+			// 停止智能轮询
+			if (this.smartPolling) {
+				this.smartPolling.stopPolling('tableStatus')
+				this.smartPolling.stopPolling('tableCount')
+			}
 		},
 		methods: {
 			init() {
 				this.fetchData()
-				this.dsq = setInterval(() => {
-					if(this.tabs && this.tabs.length){
-						this.getTableList()
-						this.getTableConunt()
-					}
-				}, 3000)
+				this.setupSmartPolling()
+			},
+			
+			// 设置智能轮询
+			setupSmartPolling() {
+				// 导入智能轮询管理器
+				import('@/common/smart-polling-manager.js').then(module => {
+					this.smartPolling = module.default
+					
+					// 创建餐桌状态轮询
+					this.smartPolling.createPolling('tableStatus', async () => {
+						if (this.tabs && this.tabs.length) {
+							await this.getTableList()
+						}
+					}, {
+						activeInterval: 10000,   // 活跃时10秒
+						inactiveInterval: 30000, // 非活跃时30秒
+						offlineInterval: 60000   // 离线时60秒
+					})
+					
+					// 创建餐桌统计轮询
+					this.smartPolling.createPolling('tableCount', async () => {
+						if (this.tabs && this.tabs.length) {
+							await this.getTableConunt()
+						}
+					}, {
+						activeInterval: 15000,   // 活跃时15秒
+						inactiveInterval: 45000, // 非活跃时45秒
+						offlineInterval: 90000   // 离线时90秒
+					})
+					
+					// 启动轮询
+					this.smartPolling.startPolling('tableStatus')
+					this.smartPolling.startPolling('tableCount')
+					
+					console.log('🚀 餐桌智能轮询已启动')
+				})
 			},
 			async fetchData() {
 				const {
@@ -155,20 +186,126 @@
 				}
 			},
 			async getTableList() {
-				const {
-					data: {
-						list
+				try {
+					const {
+						data: {
+							list
+						}
+					} = await this.beg.request({
+						url: this.api.inTabel,
+						data: {
+							areaId: this.areaId,
+							state: this.state,
+							pageSize: 999,
+						}
+					})
+					
+					// 增量更新逻辑
+					const newTables = list ? list : []
+					const changes = this.detectTableChanges(this.tabelList, newTables)
+					
+					if (changes.length > 0) {
+						console.log(`📊 餐桌状态更新: ${changes.length} 个桌台发生变化`)
+						this.tabelList = newTables
+						
+						// 可选：通知其他组件桌台状态变化
+						uni.$emit('tableStatusChanged', {
+							changes,
+							total: newTables.length,
+							areaId: this.areaId
+						})
+					} else {
+						console.log('📊 餐桌状态无变化')
 					}
-				} = await this.beg.request({
-					url: this.api.inTabel,
-					data: {
-						areaId: this.areaId,
-						state: this.state,
-						pageSize: 999,
+				} catch (error) {
+					console.error('获取餐桌列表失败:', error)
+					// 网络错误时保持现有数据，不清空列表
+				}
+			},
+			
+			// 检测餐桌状态变化
+			detectTableChanges(oldTables, newTables) {
+				const changes = []
+				
+				// 创建旧数据的映射
+				const oldTableMap = new Map()
+				oldTables.forEach(table => {
+					oldTableMap.set(table.id, table)
+				})
+				
+				// 检查新数据中的变化
+				newTables.forEach(newTable => {
+					const oldTable = oldTableMap.get(newTable.id)
+					
+					if (!oldTable) {
+						// 新增的桌台
+						changes.push({
+							type: 'added',
+							table: newTable
+						})
+					} else if (this.hasTableChanged(oldTable, newTable)) {
+						// 状态发生变化的桌台
+						changes.push({
+							type: 'updated',
+							table: newTable,
+							oldTable: oldTable,
+							changedFields: this.getChangedFields(oldTable, newTable)
+						})
 					}
 				})
-				this.tabelList = list ? list : []
 				
+				// 检查被删除的桌台
+				oldTables.forEach(oldTable => {
+					const exists = newTables.find(t => t.id === oldTable.id)
+					if (!exists) {
+						changes.push({
+							type: 'removed',
+							table: oldTable
+						})
+					}
+				})
+				
+				return changes
+			},
+			
+			// 检查桌台是否发生变化
+			hasTableChanged(oldTable, newTable) {
+				const keyFields = ['state', 'people', 'minutes', 'scan', 'order']
+				
+				for (const field of keyFields) {
+					if (field === 'order') {
+						// 特殊处理订单对象
+						const oldMoney = oldTable.order?.money || 0
+						const newMoney = newTable.order?.money || 0
+						if (oldMoney !== newMoney) return true
+					} else {
+						if (oldTable[field] !== newTable[field]) return true
+					}
+				}
+				
+				return false
+			},
+			
+			// 获取变化的字段
+			getChangedFields(oldTable, newTable) {
+				const changes = {}
+				const keyFields = ['state', 'people', 'minutes', 'scan', 'order']
+				
+				keyFields.forEach(field => {
+					if (field === 'order') {
+						const oldMoney = oldTable.order?.money || 0
+						const newMoney = newTable.order?.money || 0
+						if (oldMoney !== newMoney) {
+							changes[field] = { old: oldMoney, new: newMoney }
+						}
+					} else {
+						if (oldTable[field] !== newTable[field]) {
+							changes[field] = { old: oldTable[field], new: newTable[field] }
+						}
+					}
+				})
+				
+				return changes
 			},
 			async getTableConunt() {
 				const {
@@ -195,13 +332,18 @@
 				this.getTableConunt()
 			},
 			clickItem(v, i) {
-				console.log('1212')
-				console.log(v)
+				console.log('餐桌点击:', v)
+				
+				// 设置选中状态
+				this.selectedTableId = v.id
+				
 				if(!this.handOver.id){
-					console.log('2121')
+					console.log('需要交班')
 					return this.$emit('openOver')
 				}
+				
 				this.form = v
+				
 				if (v.state == 0 && v.diningType == 4) {
 					this.value = v.type.max
 					this.$refs['shareRef'].open('open', v)
@@ -246,6 +388,33 @@
 			},
 			clear(){
 				clearInterval(this.dsq)
+			},
+			
+			// 虚拟滚动相关方法
+			handleTableScroll(scrollInfo) {
+				// 处理滚动事件，可以用于性能监控
+				console.log('餐桌列表滚动:', scrollInfo)
+			},
+			
+			handleLoadMore() {
+				// 处理加载更多餐桌
+				console.log('加载更多餐桌')
+				// 这里可以实现分页加载逻辑
+			},
+			
+			// 滚动到指定餐桌
+			scrollToTable(tableId) {
+				if (this.$refs.virtualTableList) {
+					this.$refs.virtualTableList.scrollToTable(tableId)
+				}
+			},
+			
+			// 刷新餐桌列表
+			refreshTableList() {
+				if (this.$refs.virtualTableList) {
+					this.$refs.virtualTableList.refresh()
+				}
+				this.getTableList()
 			}
 		}
 	})

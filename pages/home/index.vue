@@ -70,6 +70,9 @@
 		<notice :isNotice="isNotice" @closeNotice="isNotice=false" />
 		<center :isCenter="isCenter" @closeCenter="isCenter=false" />
 		<openShare ref='openRef' @save="openSave" />
+		
+		<!-- PWA管理器 -->
+		<pwa-manager />
 		<view v-if="show">
 			<u-popup :show="isMore" mode="left" @close="isMore=false">
 				<view class="mode f20">
@@ -121,32 +124,24 @@
 	// #ifdef APP-PLUS
 	const plug = uni.requireNativePlugin("Html5app-TwoDisplay");
 
-	import ZyUpg from "@/components/zy-upgrade/zy-upgrade.vue"
+	// ZyUpg 组件将在components中异步加载
 	// #endif
 	import i18n from '@/locale/index.js'
-	import billing from './components/billing.vue';
-	import desk from './components/desk.vue';
-	import recharge from './components/recharge.vue';
-	import order from './components/order.vue';
-	import member from './components/member.vue';
-	import verification from './components/verification.vue';
-	import goods from './components/goods.vue';
-	import reconciliation from './components/reconciliation.vue';
-	import staffs from './components/staffs.vue';
-	import refund from './components/refund.vue';
-	import shift from './components/shift.vue';
-	import information from './components/information.vue';
-	import setup from './components/setup.vue';
-	import print from './components/print.vue';
-	import callOrder from './components/callOrder.vue';
-	import setGoods from './components/setGoods.vue';
+	// 核心组件立即加载
+	import tool from '@/components/tool/tool.vue'
+	import pTab from './components/tab/pTab.vue'
+	
+	// 工具组件立即加载（小文件）
 	import typer from '@/components/tool/typer.vue';
 	import notice from '@/components/tool/notice.vue';
 	import center from '@/components/tool/center.vue';
-	import tool from '@/components/tool/tool.vue'
-	import pTab from './components/tab/pTab.vue'
 	import openShare from '@/components/other/openShare.vue'
-	import verificationdl from './components/verificationdl.vue';
+	
+	// 导入异步组件加载器
+	import { createAsyncComponent } from '@/common/async-component-loader.js'
+	
+	// PWA管理器
+	import PWAManager from '@/components/pwa/pwa-manager.vue'
 	import site from '@/custom/siteroot.js';
 	import {
 		mapState,
@@ -154,32 +149,87 @@
 	} from 'vuex'
 	export default {
 		components: {
-			billing,
-			desk,
-			recharge,
-			order,
-			member,
-			verification,
-			goods,
-			reconciliation,
-			staffs,
-			refund,
-			shift,
-			information,
-			setup,
-			print,
-			callOrder,
-			setGoods,
+			// 核心组件立即加载
+			tool,
+			pTab,
 			typer,
 			notice,
 			center,
-			tool,
-			pTab,
 			openShare,
-			verificationdl,
+			PWAManager,
+			
+			// 业务组件异步加载
+			billing: () => createAsyncComponent(
+				() => import('./components/billing.vue'),
+				{ delay: 100 }
+			),
+			desk: () => createAsyncComponent(
+				() => import('./components/desk.vue'),
+				{ delay: 100 }
+			),
+			order: () => createAsyncComponent(
+				() => import('./components/order.vue'),
+				{ delay: 150 }
+			),
+			member: () => createAsyncComponent(
+				() => import('./components/member.vue'),
+				{ delay: 150 }
+			),
+			callOrder: () => createAsyncComponent(
+				() => import('./components/callOrder.vue'),
+				{ delay: 200 }
+			),
+			reconciliation: () => createAsyncComponent(
+				() => import('./components/reconciliation.vue'),
+				{ delay: 200 }
+			),
+			verification: () => createAsyncComponent(
+				() => import('./components/verification.vue'),
+				{ delay: 200 }
+			),
+			goods: () => createAsyncComponent(
+				() => import('./components/goods.vue'),
+				{ delay: 250 }
+			),
+			setGoods: () => createAsyncComponent(
+				() => import('./components/setGoods.vue'),
+				{ delay: 250 }
+			),
+			staffs: () => createAsyncComponent(
+				() => import('./components/staffs.vue'),
+				{ delay: 300 }
+			),
+			refund: () => createAsyncComponent(
+				() => import('./components/refund.vue'),
+				{ delay: 300 }
+			),
+			shift: () => createAsyncComponent(
+				() => import('./components/shift.vue'),
+				{ delay: 300 }
+			),
+			information: () => createAsyncComponent(
+				() => import('./components/information.vue'),
+				{ delay: 350 }
+			),
+			setup: () => createAsyncComponent(
+				() => import('./components/setup.vue'),
+				{ delay: 350 }
+			),
+			print: () => createAsyncComponent(
+				() => import('./components/print.vue'),
+				{ delay: 350 }
+			),
+			recharge: () => createAsyncComponent(
+				() => import('./components/recharge.vue'),
+				{ delay: 400 }
+			),
+			verificationdl: () => createAsyncComponent(
+				() => import('./components/verificationdl.vue'),
+				{ delay: 400 }
+			),
 
 			// #ifdef APP-PLUS
-			ZyUpg,
+			ZyUpg: () => import("@/components/zy-upgrade/zy-upgrade.vue"),
 			// #endif
 		},
 		computed: {

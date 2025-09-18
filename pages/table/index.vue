@@ -150,6 +150,41 @@
 		methods: {
 			...mapMutations(["setVip"]),
 			...mapMutations(["setConfig"]),
+			
+			// 使用称重管理器处理称重数据
+			async processWeightWithManager(weightData, product) {
+				try {
+					// 动态导入称重管理器
+					const weightManager = await import('@/common/weight-manager.js').then(m => m.default)
+					
+					// 缓存商品信息
+					weightManager.cacheProduct(product)
+					
+					// 本地计算称重结果
+					const result = weightManager.processWeight(
+						weightData.weight,
+						product,
+						{
+							storeId: this.form.storeId,
+							storeName: this.$store.state.store?.name,
+							tableName: this.form.name,
+							enablePrint: true,
+							diningType: this.form.diningType,
+							tableId: this.form.id,
+							userId: this.vipInfo?.id || this.params.userId
+						}
+					)
+					
+					console.log('⚖️ 餐桌称重计算完成:', result)
+					
+				} catch (error) {
+					console.error('餐桌称重处理失败:', error)
+					uni.showToast({
+						title: '称重计算失败',
+						icon: 'none'
+					})
+				}
+			},
 			init() {
 				this.setVip({})
 				this.getCategory()
@@ -400,30 +435,8 @@
 							if (this.$store.state.cashierprint == 1 && p.weight) {
 								var seleitem = sList.find(v => v.spuId == p.g.id)
 								if (seleitem) {
-									var avgprice = (seleitem.discountPice && parseFloat(seleitem.discountPice) > 0 
-									    ? parseFloat(seleitem.discountPice) * 100 
-									    : seleitem.price * 100).toFixed(2);
-									console.log(avgprice)
-									const weightNum = parseFloat(p.weight.weight) || 0;
-
-									var totalprice = (weightNum * avgprice).toFixed(2);
-									const nowTime = uni.$u.timeFormat(new Date(), 'yyyy-mm-dd hh:MM:ss');
-									var printweigth = {
-										storename: this.$store.state.store.name,
-										name: p.weight.name,
-										weight: p.weight.weight,
-										avgprice: avgprice,
-										price: totalprice,
-										tablename: this.form.name,
-										created_at: nowTime,
-										height: 20
-									}
-									const cashierPrint = uni.requireNativePlugin('CashierPrint')
-									if (cashierPrint != null) {
-										cashierPrint.PrintGoodsWeight(printweigth, res => {
-											console.log(res)
-										});
-									}
+									// 使用新的称重管理器进行本地计算
+									this.processWeightWithManager(p.weight, seleitem)
 								}
 							}
 							// #endif

@@ -2,35 +2,35 @@
 
 ## 立即实施（10分钟见效）
 
-- [ ] 1. 启用生产构建配置
+- [x] 1. 启用生产构建配置
   - 修改 vite.config.js 确保使用 production 模式和 esbuild 压缩
   - 禁用 sourcemap 生成以减少包体积
   - 设置 target: 'es2020' 以启用现代 JavaScript 特性
   - 验证构建输出目录指向 unpackage/dist/build/web/
   - _Requirements: 2.3, 2.4_
 
-- [ ] 2. 优化 manifest.json WebView 配置
+- [x] 2. 优化 manifest.json WebView 配置
   - 在 Android 配置中添加 "hardwareAccelerated": true
   - 在 Android 配置中添加 "largeHeap": true
   - 设置 "runmode": "liberate" 以启用释放模式
   - 启用 "optimization.subPackages": true 进行分包优化
   - _Requirements: 2.1, 2.2_
 
-- [ ] 3. 压缩大型图片资源
+- [x] 3. 压缩大型图片资源
   - 识别 static/imgs/ 目录中超过 100KB 的图片文件
   - 使用在线工具或脚本将图片压缩到 200KB 以下
   - 将 PNG/JPG 格式转换为 WebP 格式以减少 30-50% 文件大小
   - 更新代码中的图片引用路径
   - _Requirements: 4.1, 4.2_
 
-- [ ] 4. 实施餐桌状态智能轮询
+- [x] 4. 实施餐桌状态智能轮询
   - 修改 pages/table/index.vue 中的轮询间隔从 3000ms 改为 10000ms
   - 添加页面可见性检测，后台时延长轮询间隔到 30000ms
   - 实现增量更新逻辑，只更新状态发生变化的桌台
   - 添加网络状态监听，离线时停止轮询
   - _Requirements: 3.1, 3.2_
 
-- [ ] 5. 实现称重功能本地计算
+- [x] 5. 实现称重功能本地计算
   - 修改称重相关组件，实现重量和价格的本地计算
   - 添加立即 UI 更新逻辑，提供即时反馈
   - 实现异步服务器同步，网络可用时自动同步数据
@@ -39,21 +39,21 @@
 
 ## 短期实施（1周内）
 
-- [ ] 6. 实现代码分割和懒加载
+- [x] 6. 实现代码分割和懒加载
   - 配置 Vite rollupOptions 进行手动代码分块
   - 将大型第三方库（echarts、xlsx）设置为异步加载
   - 实现路由级别的懒加载，使用 () => import() 语法
   - 优化 vendor chunk 配置，分离 Vue、uView、工具库
   - _Requirements: 2.4, 5.2_
 
-- [ ] 7. 创建虚拟滚动组件
+- [x] 7. 创建虚拟滚动组件
   - 开发通用的虚拟滚动列表组件
   - 在餐桌管理页面应用虚拟滚动优化大列表渲染
   - 在商品列表页面实现虚拟滚动以提升滚动性能
   - 添加动态高度支持和缓冲区配置
   - _Requirements: 5.2, 5.4_
 
-- [ ] 8. 实施 PWA 缓存策略
+- [x] 8. 实施 PWA 缓存策略
   - 配置 vite-plugin-pwa 插件进行资源缓存
   - 设置 API 响应缓存策略，缓存商品和会员数据
   - 实现离线页面缓存，确保核心功能离线可用
