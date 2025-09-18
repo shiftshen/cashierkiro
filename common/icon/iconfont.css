@@ -3,8 +3,8 @@
   /* Color fonts */
   src: 
        url('~@/common/icon/iconfont.woff2?t=1701938567588') format('woff2'),
-       url('~@/common/icon/iconfont.woff?t=1701938567588') format('woff'),
-       url('~@/common/icon/iconfont.ttf?t=1701938567588') format('truetype');
+       url('~@/common/icon/iconfont.woff?t=1701938567588') format('woff');
+  font-display: swap; /* 优化字体加载性能 */
 }
 
 .iconfont {
