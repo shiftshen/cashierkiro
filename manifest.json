@@ -1,9 +1,9 @@
 {
     "name" : "DAMO CASHIER1",
     "appid" : "__UNI__G62094C7",
-    "description" : "test",
-    "versionName" : "1.4.5",
-    "versionCode" : 145,
+    "description" : "test888",
+    "versionName" : "1.4.6",
+    "versionCode" : 146,
     "transformPx" : false,
     "sassImplementationName" : "node-sass",
     "app-plus" : {
@@ -13,10 +13,6 @@
         "usingComponents" : true,
         "nvueCompiler" : "uni-app",
         "nvueStyleCompiler" : "uni-app",
-        "optimization" : {
-            "subPackages" : true
-        },
-        "runmode" : "liberate",
         "splashscreen" : {
             "alwaysShowBeforeRender" : true,
             "waiting" : true,
@@ -36,9 +32,6 @@
             /* 应用发布信息 */
             "android" : {
                 /* android打包配置 */
-                "hardwareAccelerated" : true,
-                "largeHeap" : true,
-                "resizeableActivity" : false,
                 "permissions" : [
                     "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
@@ -56,14 +49,12 @@
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
                     "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
                 ],
-                "abiFilters" : [ "armeabi-v7a", "arm64-v8a" ],
-                "minSdkVersion" : 23,
-                "targetSdkVersion" : 33
+                "abiFilters" : [ "armeabi-v7a", "arm64-v8a", "x86" ],
+                "minSdkVersion" : 23
             },
             "ios" : {
                 "dSYMs" : false,
-                "idfa" : false,
-                "deploymentTarget" : "11.0"
+                "idfa" : false
             },
             /* ios打包配置 */
             "sdkConfigs" : {
