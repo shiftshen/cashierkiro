@@ -1,7 +1,7 @@
 {
-    "name" : "DAMO CASHIER",
-    "appid" : "__UNI__90E2460",
-    "description" : "",
+    "name" : "DAMO CASHIER1",
+    "appid" : "__UNI__G62094C7",
+    "description" : "test",
     "versionName" : "1.4.5",
     "versionCode" : 145,
     "transformPx" : false,
@@ -121,20 +121,6 @@
                     "pid" : "",
                     "parameters" : {}
                 }
-            },
-            "Html5app-TwoDisplay" : {
-                "__plugin_info__" : {
-                    "name" : "Android 双屏 异显 插件 双屏（副屏）异显，主副屏通讯",
-                    "description" : "Android 双屏异显插件,收银机设备等等。",
-                    "platforms" : "Android",
-                    "url" : "https://ext.dcloud.net.cn/plugin?id=2126",
-                    "android_package_name" : "uni.UNI90E2460",
-                    "ios_bundle_id" : "",
-                    "isCloud" : true,
-                    "bought" : 1,
-                    "pid" : "2126",
-                    "parameters" : {}
-                }
             }
         }
     },
@@ -169,5 +155,6 @@
             }
         }
     },
-    "fallbackLocale" : "zh-Hans"
+    "fallbackLocale" : "zh-Hans",
+    "locale" : "zh-Hans"
 }

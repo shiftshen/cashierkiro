@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-09-18T19:30:59.429Z",
+  "appName": "DAMO CASHIER",
+  "version": "1.4.5",
+  "versionCode": 145,
+  "appId": "__UNI__90E2460",
+  "apiUrl": "https://www.vdamo.com",
+  "platforms": [
+    "Android",
+    "iOS"
+  ],
+  "features": [
+    "收银台操作",
+    "会员管理",
+    "商品管理",
+    "订单处理",
+    "交班功能",
+    "桌台管理",
+    "实时通知",
+    "多语言支持",
+    "扫码支付",
+    "打印功能",
+    "双屏显示"
+  ],
+  "buildMethods": [
+    {
+      "name": "HBuilderX 云打包",
+      "recommended": true,
+      "description": "最简单的打包方式，无需本地环境配置"
+    },
+    {
+      "name": "离线打包",
+      "recommended": false,
+      "description": "需要配置本地开发环境，适合高级用户"
+    }
+  ]
+}
