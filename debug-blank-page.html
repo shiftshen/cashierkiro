@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>空白页面调试工具</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .debug-title { font-weight: bold; color: #333; margin-bottom: 10px; }
+        .debug-item { margin: 5px 0; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        button { padding: 8px 16px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+    </style>
+</head>
+<body>
+    <h1>🔍 空白页面调试工具</h1>
+    
+    <div class="debug-section">
+        <div class="debug-title">快速操作</div>
+        <button class="btn-primary" onclick="location.reload()">刷新页面</button>
+        <button class="btn-success" onclick="clearCache()">清除缓存</button>
+        <button class="btn-warning" onclick="showConsole()">打开控制台</button>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-title">页面状态检查</div>
+        <div id="page-status">正在检查...</div>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-title">用户角色信息</div>
+        <div id="role-info">正在获取...</div>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-title">组件加载状态</div>
+        <div id="component-status">正在检查...</div>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-title">网络请求状态</div>
+        <div id="network-status">正在检查...</div>
+    </div>
+    
+    <script>
+        function clearCache() {
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => caches.delete(name));
+                });
+            }
+            localStorage.clear();
+            sessionStorage.clear();
+            alert('缓存已清除，请刷新页面');
+        }
+        
+        function showConsole() {
+            alert('请按 F12 或右键选择"检查元素"打开开发者工具');
+        }
+        
+        // 检查页面状态
+        function checkPageStatus() {
+            const status = document.getElementById('page-status');
+            const checks = [
+                { name: 'Vue 实例', check: () => window.Vue !== undefined },
+                { name: 'Vuex Store', check: () => window.$store !== undefined },
+                { name: 'uni-app', check: () => window.uni !== undefined },
+                { name: 'DOM 加载', check: () => document.readyState === 'complete' }
+            ];
+            
+            let html = '';
+            checks.forEach(item => {
+                const result = item.check();
+                const className = result ? 'success' : 'error';
+                const icon = result ? '✅' : '❌';
+                html += `<div class="debug-item ${className}">${icon} ${item.name}: ${result ? '正常' : '异常'}</div>`;
+            });
+            
+            status.innerHTML = html;
+        }
+        
+        // 检查用户角色
+        function checkRoleInfo() {
+            const roleInfo = document.getElementById('role-info');
+            
+            try {
+                // 尝试从 localStorage 获取用户信息
+                const userInfo = localStorage.getItem('user') || sessionStorage.getItem('user');
+                if (userInfo) {
+                    const user = JSON.parse(userInfo);
+                    roleInfo.innerHTML = `
+                        <div class="debug-item success">✅ 用户信息存在</div>
+                        <div class="debug-item">角色数据: ${JSON.stringify(user.roleData || [])}</div>
+                    `;
+                } else {
+                    roleInfo.innerHTML = '<div class="debug-item warning">⚠️ 未找到用户信息</div>';
+                }
+            } catch (error) {
+                roleInfo.innerHTML = `<div class="debug-item error">❌ 获取用户信息失败: ${error.message}</div>`;
+            }
+        }
+        
+        // 检查组件状态
+        function checkComponentStatus() {
+            const componentStatus = document.getElementById('component-status');
+            
+            // 检查主要组件文件是否可访问
+            const components = [
+                '/pages/home/components/billing.vue',
+                '/pages/home/components/desk.vue'
+            ];
+            
+            let html = '';
+            let checkedCount = 0;
+            
+            components.forEach(comp => {
+                fetch(comp, { method: 'HEAD' })
+                    .then(response => {
+                        const status = response.ok ? 'success' : 'error';
+                        const icon = response.ok ? '✅' : '❌';
+                        html += `<div class="debug-item ${status}">${icon} ${comp}: ${response.ok ? '可访问' : '无法访问'}</div>`;
+                        checkedCount++;
+                        if (checkedCount === components.length) {
+                            componentStatus.innerHTML = html;
+                        }
+                    })
+                    .catch(error => {
+                        html += `<div class="debug-item error">❌ ${comp}: 检查失败</div>`;
+                        checkedCount++;
+                        if (checkedCount === components.length) {
+                            componentStatus.innerHTML = html;
+                        }
+                    });
+            });
+        }
+        
+        // 检查网络状态
+        function checkNetworkStatus() {
+            const networkStatus = document.getElementById('network-status');
+            
+            // 检查基本网络连接
+            if (navigator.onLine) {
+                networkStatus.innerHTML = '<div class="debug-item success">✅ 网络连接正常</div>';
+                
+                // 尝试请求 API
+                fetch('/api/health', { method: 'HEAD' })
+                    .then(response => {
+                        const status = response.ok ? 'success' : 'warning';
+                        const icon = response.ok ? '✅' : '⚠️';
+                        networkStatus.innerHTML += `<div class="debug-item ${status}">${icon} API 服务: ${response.ok ? '正常' : '异常'}</div>`;
+                    })
+                    .catch(error => {
+                        networkStatus.innerHTML += '<div class="debug-item warning">⚠️ API 服务: 无法连接</div>';
+                    });
+            } else {
+                networkStatus.innerHTML = '<div class="debug-item error">❌ 网络连接异常</div>';
+            }
+        }
+        
+        // 页面加载完成后执行检查
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                checkPageStatus();
+                checkRoleInfo();
+                checkComponentStatus();
+                checkNetworkStatus();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

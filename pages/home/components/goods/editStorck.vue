@@ -198,9 +198,11 @@
 	}
 
 	@media (min-width: 1500px) and (max-width: 3280px) {
-		width: 900px;
-		.main{
-			height: 480px;
+		.invent {
+			width: 900px;
+			.main{
+				height: 480px;
+			}
 		}
 	}
 </style>

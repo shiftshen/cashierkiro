@@ -46,23 +46,43 @@
 				</view>
 			</view> -->
 			<view class="f-1">
-				<billing v-if="current==0 && role.includes('diandan')" ref="billingRef" @openOver="getOpen" />
-				<desk v-if="current==1 && role.includes('zhuotai')" ref="deskRef" @openOver="getOpen" />
-				<callOrder v-if="current==2 && role.includes('jiaohao')" ref="callRef" />
-				<!-- <recharge v-if="current==3" ref="recharRef" /> -->
-				<reconciliation v-if="current==3 && role.includes('duizhang')" ref="recontionRef" />
-				<order v-if="current==4 && role.includes('dingdan')" ref="orderRef" />
-				<member v-if="current==5 && role.includes('huiyuan')" ref="memberRef" />
-				<verification v-if="current==6 && role.includes('diandan')" @cT="changeTab" ref="verificationRef" />
-				<goods v-if="current==7 && role.includes('goods')" ref="goodsRef" />
-				<staffs v-if="current==8 && role.includes('diandan')" />
-				<refund v-if="current==9 && role.includes('diandan')" />
-				<shift v-if="current==10 && role.includes('jiaoban')" ref="shiftRef" />
-				<information v-if="current==11 && role.includes('diandan')" />
-				<setup v-if="current==12 && role.includes('diandan')" />
-				<print v-if="current==13 && role.includes('yingjian')" ref="printRef" />
-				<setGoods v-if="current==15 && role.includes('xitong')" ref="setGoodsRef" />
-				<verificationdl v-if="current==61 && role.includes('diandan')" ref="verificationdlRef" />
+				<!-- 调试信息组件 -->
+				<role-debug v-if="showDebug" :current="current" />
+				
+				<!-- 主要内容区域 - 修复角色检查逻辑 -->
+				<billing v-if="current==0 && (role.includes('diandan') || role.length === 0)" ref="billingRef" @openOver="getOpen" />
+				<desk v-if="current==1 && (role.includes('zhuotai') || role.length === 0)" ref="deskRef" @openOver="getOpen" />
+				<callOrder v-if="current==2 && (role.includes('jiaohao') || role.length === 0)" ref="callRef" />
+				<reconciliation v-if="current==3 && (role.includes('duizhang') || role.length === 0)" ref="recontionRef" />
+				<order v-if="current==4 && (role.includes('dingdan') || role.length === 0)" ref="orderRef" />
+				<member v-if="current==5 && (role.includes('huiyuan') || role.length === 0)" ref="memberRef" />
+				<verification v-if="current==6 && (role.includes('diandan') || role.length === 0)" @cT="changeTab" ref="verificationRef" />
+				<goods v-if="current==7 && (role.includes('goods') || role.length === 0)" ref="goodsRef" />
+				<staffs v-if="current==8 && (role.includes('diandan') || role.length === 0)" />
+				<refund v-if="current==9 && (role.includes('diandan') || role.length === 0)" />
+				<shift v-if="current==10 && (role.includes('jiaoban') || role.length === 0)" ref="shiftRef" />
+				<information v-if="current==11 && (role.includes('diandan') || role.length === 0)" />
+				<setup v-if="current==12 && (role.includes('diandan') || role.length === 0)" />
+				<print v-if="current==13 && (role.includes('yingjian') || role.length === 0)" ref="printRef" />
+				<setGoods v-if="current==15 && (role.includes('xitong') || role.length === 0)" ref="setGoodsRef" />
+				<verificationdl v-if="current==61 && (role.includes('diandan') || role.length === 0)" ref="verificationdlRef" />
+				
+				<!-- 如果没有匹配的组件显示，显示提示信息 -->
+				<view v-if="!hasMatchingComponent" class="no-content-warning">
+					<view class="warning-icon">⚠️</view>
+					<view class="warning-text">当前页面内容未加载</view>
+					<view class="warning-details">
+						<text>当前标签: {{ current }}</text><br>
+						<text>用户角色: {{ JSON.stringify(role) }}</text><br>
+						<text>请检查权限设置或刷新页面</text>
+					</view>
+					<view class="warning-actions">
+						<button @click="refreshPage" class="refresh-btn">刷新页面</button>
+						<button @click="showDebug = !showDebug" class="debug-btn">
+							{{ showDebug ? '隐藏' : '显示' }}调试信息
+						</button>
+					</view>
+				</view>
 			</view>
 		</view>
 
@@ -164,6 +184,9 @@
 			// 性能监控组件 (按需加载)
 			PerformanceDashboard: () => import('@/components/performance/performance-dashboard.vue'),
 			
+			// 调试组件
+			RoleDebug: () => import('@/components/debug/role-debug.vue'),
+			
 			// 业务组件直接导入
 			billing: () => import('./components/billing.vue'),
 			desk: () => import('./components/desk.vue'),
@@ -205,6 +228,30 @@
 					return roleData;
 				},
 			}),
+			// 检查是否有匹配的组件
+			hasMatchingComponent() {
+				const componentMap = {
+					0: 'diandan',
+					1: 'zhuotai', 
+					2: 'jiaohao',
+					3: 'duizhang',
+					4: 'dingdan',
+					5: 'huiyuan',
+					6: 'diandan',
+					7: 'goods',
+					8: 'diandan',
+					9: 'diandan',
+					10: 'jiaoban',
+					11: 'diandan',
+					12: 'diandan',
+					13: 'yingjian',
+					15: 'xitong',
+					61: 'diandan'
+				};
+				
+				const requiredRole = componentMap[this.current];
+				return !requiredRole || this.role.includes(requiredRole) || this.role.length === 0;
+			}
 		},
 		data() {
 			return {
@@ -214,6 +261,8 @@
 				isMore: false,
 				// 性能监控面板显示状态
 				showPerformanceDashboard: false,
+				// 调试模式
+				showDebug: false,
 				isType: false, //打印机
 				isNotice: false, //消息
 				isCenter: false, //个人中心
@@ -404,6 +453,10 @@
 		},
 		methods: {
 			...mapMutations(["setConfig", "setHandOver", "setUser"]),
+			// 刷新页面方法
+			refreshPage() {
+				location.reload();
+			},
 			init() {
 				this.$nextTick(() => {
 					// 在 DOM 更新完成后访问 $refs
@@ -671,6 +724,70 @@
 				width: 90px;
 				height: 90px;
 				border-radius: 5px;
+			}
+		}
+	}
+	
+	// 警告信息样式
+	.no-content-warning {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 40px 20px;
+		text-align: center;
+		background: #fff8e1;
+		border: 2px dashed #ffc107;
+		border-radius: 12px;
+		margin: 20px;
+		
+		.warning-icon {
+			font-size: 48px;
+			margin-bottom: 16px;
+		}
+		
+		.warning-text {
+			font-size: 18px;
+			font-weight: bold;
+			color: #f57c00;
+			margin-bottom: 12px;
+		}
+		
+		.warning-details {
+			font-size: 14px;
+			color: #666;
+			line-height: 1.5;
+			margin-bottom: 20px;
+		}
+		
+		.warning-actions {
+			display: flex;
+			gap: 12px;
+			
+			button {
+				padding: 8px 16px;
+				border: none;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 14px;
+				
+				&.refresh-btn {
+					background: #007aff;
+					color: white;
+					
+					&:hover {
+						background: #0056cc;
+					}
+				}
+				
+				&.debug-btn {
+					background: #f0f0f0;
+					color: #333;
+					
+					&:hover {
+						background: #e0e0e0;
+					}
+				}
 			}
 		}
 	}
