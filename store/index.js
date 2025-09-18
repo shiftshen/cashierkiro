@@ -7,7 +7,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
 	state: {
-		user: uni.getStorageSync('user_info'),
+		user: uni.getStorageSync('user_info') || {},
 		token: '',
 		isLogin: false,
 		storeInfo: uni.getStorageSync('storeInfo'),

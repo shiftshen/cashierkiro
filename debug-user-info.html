@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>用户信息调试</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .info-box { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        pre { background: #f0f0f0; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>用户信息调试页面</h1>
+    
+    <div class="info-box">
+        <h3>本地存储检查</h3>
+        <div id="storage-info"></div>
+    </div>
+    
+    <div class="info-box">
+        <h3>用户信息详情</h3>
+        <div id="user-details"></div>
+    </div>
+    
+    <div class="info-box">
+        <h3>角色权限检查</h3>
+        <div id="role-check"></div>
+    </div>
+    
+    <script>
+        // 检查本地存储
+        function checkStorage() {
+            const storageDiv = document.getElementById('storage-info');
+            const keys = ['user_info', 'token', 'storeInfo', 'storeId', 'uniacid'];
+            
+            let html = '<ul>';
+            keys.forEach(key => {
+                const value = localStorage.getItem(key);
+                const status = value ? 'success' : 'error';
+                html += `<li class="${status}">
+                    <strong>${key}:</strong> ${value ? '✓ 存在' : '✗ 不存在'}
+                    ${value ? `<br><small>值: ${value.substring(0, 100)}${value.length > 100 ? '...' : ''}</small>` : ''}
+                </li>`;
+            });
+            html += '</ul>';
+            
+            storageDiv.innerHTML = html;
+        }
+        
+        // 检查用户详情
+        function checkUserDetails() {
+            const userDiv = document.getElementById('user-details');
+            const userInfo = localStorage.getItem('user_info');
+            
+            if (userInfo) {
+                try {
+                    const user = JSON.parse(userInfo);
+                    userDiv.innerHTML = `
+                        <div class="success">用户信息解析成功</div>
+                        <pre>${JSON.stringify(user, null, 2)}</pre>
+                    `;
+                } catch (e) {
+                    userDiv.innerHTML = `
+                        <div class="error">用户信息解析失败: ${e.message}</div>
+                        <pre>${userInfo}</pre>
+                    `;
+                }
+            } else {
+                userDiv.innerHTML = '<div class="error">未找到用户信息</div>';
+            }
+        }
+        
+        // 检查角色权限
+        function checkRoles() {
+            const roleDiv = document.getElementById('role-check');
+            const userInfo = localStorage.getItem('user_info');
+            
+            if (userInfo) {
+                try {
+                    const user = JSON.parse(userInfo);
+                    const roleData = user.roleData;
+                    
+                    if (roleData && Array.isArray(roleData) && roleData.length > 0) {
+                        roleDiv.innerHTML = `
+                            <div class="success">角色权限正常</div>
+                            <p><strong>角色列表:</strong> ${roleData.join(', ')}</p>
+                            <p><strong>权限检查:</strong></p>
+                            <ul>
+                                <li>订单权限 (diandan): ${roleData.includes('diandan') ? '✓' : '✗'}</li>
+                                <li>桌台权限 (zhuotai): ${roleData.includes('zhuotai') ? '✓' : '✗'}</li>
+                                <li>叫号权限 (jiaohao): ${roleData.includes('jiaohao') ? '✓' : '✗'}</li>
+                                <li>对账权限 (duizhang): ${roleData.includes('duizhang') ? '✓' : '✗'}</li>
+                                <li>订单管理权限 (dingdan): ${roleData.includes('dingdan') ? '✓' : '✗'}</li>
+                                <li>会员权限 (huiyuan): ${roleData.includes('huiyuan') ? '✓' : '✗'}</li>
+                            </ul>
+                        `;
+                    } else {
+                        roleDiv.innerHTML = `
+                            <div class="error">角色权限为空或无效</div>
+                            <p>roleData: ${JSON.stringify(roleData)}</p>
+                            <p><strong>建议:</strong> 检查登录流程是否正确设置了用户角色</p>
+                        `;
+                    }
+                } catch (e) {
+                    roleDiv.innerHTML = `
+                        <div class="error">角色检查失败: ${e.message}</div>
+                    `;
+                }
+            } else {
+                roleDiv.innerHTML = '<div class="error">无法检查角色，用户信息不存在</div>';
+            }
+        }
+        
+        // 页面加载时执行检查
+        window.onload = function() {
+            checkStorage();
+            checkUserDetails();
+            checkRoles();
+        };
+        
+        // 每5秒刷新一次
+        setInterval(() => {
+            checkStorage();
+            checkUserDetails();
+            checkRoles();
+        }, 5000);
+    </script>
+</body>
+</html>

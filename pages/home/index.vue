@@ -71,8 +71,8 @@
 		<center :isCenter="isCenter" @closeCenter="isCenter=false" />
 		<openShare ref='openRef' @save="openSave" />
 		
-		<!-- PWA管理器 -->
-		<pwa-manager />
+		<!-- PWA管理器 (暂时禁用) -->
+		<!-- <pwa-manager /> -->
 		
 		<!-- 性能监控面板 (开发模式) -->
 		<performance-dashboard v-if="showPerformanceDashboard" @close="showPerformanceDashboard = false" />
@@ -140,11 +140,11 @@
 	import center from '@/components/tool/center.vue';
 	import openShare from '@/components/other/openShare.vue'
 	
-	// 导入异步组件加载器
-	import { createAsyncComponent } from '@/common/async-component-loader.js'
+	// 导入异步组件加载器 (暂时禁用)
+	// import { createAsyncComponent } from '@/common/async-component-loader.js'
 	
-	// PWA管理器
-	import PWAManager from '@/components/pwa/pwa-manager.vue'
+	// PWA管理器 (暂时禁用)
+	// import PWAManager from '@/components/pwa/pwa-manager.vue'
 	import site from '@/custom/siteroot.js';
 	import {
 		mapState,
@@ -159,83 +159,29 @@
 			notice,
 			center,
 			openShare,
-			PWAManager,
+			// PWAManager,
 			
 			// 性能监控组件 (按需加载)
-			PerformanceDashboard: () => createAsyncComponent(
-				() => import('@/components/performance/performance-dashboard.vue'),
-				{ delay: 300 }
-			),
+			PerformanceDashboard: () => import('@/components/performance/performance-dashboard.vue'),
 			
-			// 业务组件异步加载
-			billing: () => createAsyncComponent(
-				() => import('./components/billing.vue'),
-				{ delay: 100 }
-			),
-			desk: () => createAsyncComponent(
-				() => import('./components/desk.vue'),
-				{ delay: 100 }
-			),
-			order: () => createAsyncComponent(
-				() => import('./components/order.vue'),
-				{ delay: 150 }
-			),
-			member: () => createAsyncComponent(
-				() => import('./components/member.vue'),
-				{ delay: 150 }
-			),
-			callOrder: () => createAsyncComponent(
-				() => import('./components/callOrder.vue'),
-				{ delay: 200 }
-			),
-			reconciliation: () => createAsyncComponent(
-				() => import('./components/reconciliation.vue'),
-				{ delay: 200 }
-			),
-			verification: () => createAsyncComponent(
-				() => import('./components/verification.vue'),
-				{ delay: 200 }
-			),
-			goods: () => createAsyncComponent(
-				() => import('./components/goods.vue'),
-				{ delay: 250 }
-			),
-			setGoods: () => createAsyncComponent(
-				() => import('./components/setGoods.vue'),
-				{ delay: 250 }
-			),
-			staffs: () => createAsyncComponent(
-				() => import('./components/staffs.vue'),
-				{ delay: 300 }
-			),
-			refund: () => createAsyncComponent(
-				() => import('./components/refund.vue'),
-				{ delay: 300 }
-			),
-			shift: () => createAsyncComponent(
-				() => import('./components/shift.vue'),
-				{ delay: 300 }
-			),
-			information: () => createAsyncComponent(
-				() => import('./components/information.vue'),
-				{ delay: 350 }
-			),
-			setup: () => createAsyncComponent(
-				() => import('./components/setup.vue'),
-				{ delay: 350 }
-			),
-			print: () => createAsyncComponent(
-				() => import('./components/print.vue'),
-				{ delay: 350 }
-			),
-			recharge: () => createAsyncComponent(
-				() => import('./components/recharge.vue'),
-				{ delay: 400 }
-			),
-			verificationdl: () => createAsyncComponent(
-				() => import('./components/verificationdl.vue'),
-				{ delay: 400 }
-			),
+			// 业务组件直接导入
+			billing: () => import('./components/billing.vue'),
+			desk: () => import('./components/desk.vue'),
+			order: () => import('./components/order.vue'),
+			member: () => import('./components/member.vue'),
+			callOrder: () => import('./components/callOrder.vue'),
+			reconciliation: () => import('./components/reconciliation.vue'),
+			verification: () => import('./components/verification.vue'),
+			goods: () => import('./components/goods.vue'),
+			setGoods: () => import('./components/setGoods.vue'),
+			staffs: () => import('./components/staffs.vue'),
+			refund: () => import('./components/refund.vue'),
+			shift: () => import('./components/shift.vue'),
+			information: () => import('./components/information.vue'),
+			setup: () => import('./components/setup.vue'),
+			print: () => import('./components/print.vue'),
+			recharge: () => import('./components/recharge.vue'),
+			verificationdl: () => import('./components/verificationdl.vue'),
 
 			// #ifdef APP-PLUS
 			ZyUpg: () => import("@/components/zy-upgrade/zy-upgrade.vue"),
@@ -244,7 +190,20 @@
 		computed: {
 			...mapState({
 				storeInfo: state => state.storeInfo,
-				role: state => state.user.roleData || [],
+				role: state => {
+					// 调试信息
+					console.log('用户信息:', state.user);
+					console.log('角色数据:', state.user?.roleData);
+					
+					// 如果没有角色数据，提供默认权限
+					const roleData = state.user?.roleData || [];
+					if (roleData.length === 0) {
+						console.warn('用户角色为空，使用默认权限');
+						// 提供基本权限，确保至少能看到订单页面
+						return ['diandan', 'zhuotai'];
+					}
+					return roleData;
+				},
 			}),
 		},
 		data() {
@@ -416,7 +375,9 @@
 			}
 		},
 		onLoad(option) {
-			//console.log('6555', this.role) 
+			console.log('页面加载，用户角色:', this.role);
+			console.log('页面选项:', option);
+			
 			if (option && option.current) {
 				this.current = option.current
 				this.l_title = option.l_title
