@@ -1,0 +1,40 @@
+{
+  "name": "damo-cashier",
+  "version": "1.4.5",
+  "description": "DAMO CASHIER - uni-app based POS system",
+  "main": "main.js",
+  "scripts": {
+    "serve": "npx http-server unpackage/dist/build/web -p 8091 -c-1 --cors",
+    "dev": "npx http-server unpackage/dist/build/web -p 8091 -c-1 --cors",
+    "start": "npm run serve",
+    "serve:source": "npx http-server . -p 8092 -c-1 --cors"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^3.4.8",
+    "@dcloudio/uni-app": "^2.0.2-4070620250821001",
+    "@dcloudio/uni-automator": "^3.0.0-4020920240930001",
+    "@dcloudio/uni-cli-shared": "^3.0.0-4020920240930001",
+    "@dcloudio/uni-stacktracey": "^3.0.0-4020920240930001",
+    "@dcloudio/webpack-uni-mp-loader": "^3.0.0-4020920240930001",
+    "@dcloudio/webpack-uni-pages-loader": "^3.0.0-4020920240930001",
+    "http-server": "^14.1.1",
+    "sass": "^1.64.2",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  },
+  "dependencies": {
+    "html2canvas": "^1.4.1",
+    "iconv-lite": "^0.6.3",
+    "vue": "^2.6.14",
+    "vuex": "^3.6.2",
+    "vuex-i18n": "^1.13.1"
+  },
+  "browserslist": [
+    "Android >= 4.4",
+    "ios >= 9"
+  ],
+  "uni-app": {
+    "scripts": {}
+  }
+}

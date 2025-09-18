@@ -1,0 +1,20 @@
+{
+	"name": "CashierPrint",
+	"id": "CashierPrint",
+	"version": "0.1.3",
+	"description": "示例插件",
+	"_dp_type":"nativeplugin",
+	"_dp_nativeplugin":{
+		"android": {
+			"plugins": [
+				{
+					"type": "module",
+					"name": "CashierPrint",
+					"class": "com.damo.uniplugin_cashierprint.PrintModule"
+				}
+			],
+			"integrateType": "aar",
+			"minSdkVersion" : 16
+		}
+	}
+}

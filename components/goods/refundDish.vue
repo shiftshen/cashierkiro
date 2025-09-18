@@ -1,0 +1,259 @@
+<template>
+	<u-overlay :show="giftDish" :opacity="0.2">
+		<view class="reduce bf p15 f18 f-y-bt" @tap.stop>
+			<view class="f-x-bt">
+				<view class="f-c f-g-1 wei f24">{{$t('goods-components.refund_dish')}}</view>
+				<!-- <text class="iconfont icon-cuowu wei5 c6 pl10" style="font-size: 19px;" @click="close"></text> -->
+			</view>
+			<view class="overflowlnr p-5-0">{{selectItem.name || selectItem.goods && selectItem.goods.name}}</view>
+			<view class="uScroll pb10">
+				<view class="f-x-bt pb15 bd1 mb10 c9">
+					<text>{{$t('goods-components.refund_quantity')}}</text>
+					<u-number-box v-model="count" :min="1" :max="num" button-size="36"></u-number-box>
+				</view>
+				<view class="f-x-e mb10">
+					<view class="f14 c9">{{$t('goods-components.max_refund')}}<text
+							class="cf5">{{selectItem.num}}</text>{{$t('goods-components.portion')}}</view>
+				</view>
+				<!-- <view class="key">
+					<keybored type="number" confirmText="确定" v-model="iCount" @input="intGift" @doneClear="count=0">
+					</keybored>
+				</view> -->
+				<view class="">
+					<view class="m15 c9 f14">{{$t('goods-components.refund_reason')}}<text
+							class="cf5 wei6 f15 pl5">*</text></view>
+					<creason :list="getReasonConfig" @getRemark="getRemark" />
+				</view>
+			</view>
+			<view class="f-1 f-y-e">
+				<u-button @click="close" class="mr20"><text
+						class="c0">{{$t('goods-components.cancel')}}</text></u-button>
+				<u-button color="#4275F4" @click="confirm"><text
+						class="cf">{{$t('goods-components.confirm_discount')}}</text></u-button>
+			</view>
+		</view>
+		<u-toast ref="uToast"></u-toast>
+	</u-overlay>
+</template>
+
+<script>
+	import creason from '@/components/other/creason.vue';
+	import keybored from '@/components/liujto-keyboard/keybored.vue';
+	import i18n from '@/locale/index.js'
+	import {
+		mapState,
+	} from 'vuex'
+	export default {
+		props: {
+			selectItem: {
+				type: Object,
+				default: {}
+			},
+			v: {
+				type: Object,
+				default: {}
+			},
+		},
+		components: {
+			creason,
+			keybored,
+		},
+		data(props) {
+			return {
+				giftDish: false,
+				num: 1,
+				count: 1,
+				iCount: '',
+				resons: [],
+				list: [this.$t('goods-components.not_meet_requirements'), this.$t('goods-components.not_fresh'), this.$t(
+					'goods-components.foreign_object_found'), this.$t('goods-components.slow_serving'), this.$t(
+					'goods-components.wrong_order'), this.$t('goods-components.extra_order')],
+			}
+		},
+
+		computed: {
+			...mapState({
+				reasonConfig: state => state.config.reasonConfig,
+			}),
+			getReasonConfig() {
+				const locale = i18n.locale;
+				if (locale === 'en') {
+					return this.reasonConfig && this.reasonConfig.en_backGoods || []
+				} else if (locale === 'th') {
+
+					return this.reasonConfig && this.reasonConfig.th_backGoods || []
+				} else {
+
+					return this.reasonConfig && this.reasonConfig.backGoods || []
+				}
+			},
+		},
+		methods: {
+			open() {
+				this.num = this.selectItem.num
+				this.count = this.selectItem.num
+				this.giftDish = true
+			},
+			close() {
+				this.reason = ''
+				this.giftDish = false
+			},
+			intGift(val) {
+				this.iCount = val
+				if (this.iCount > this.selectItem.num) {
+					this.iCount = 0
+					return uni.showToast({
+						title: this.$t('goods-components.refund_quantity_exceed'),
+						icon: 'none'
+					})
+				} else {
+					this.count = this.iCount
+				}
+			},
+			getRemark(e) {
+				this.resons = e
+			},
+			//确定
+			confirm() {
+				if (!this.count) {
+					return uni.showToast({
+						title: this.$t('goods-components.refund_quantity_enter'),
+						icon: 'none'
+					})
+				}
+				if (this.resons && this.resons.length > 0) {
+					this.$emit('cRefund', {
+						goods: [{
+							id: this.selectItem.id,
+							num: this.count
+						}],
+						type: 'backFood',
+						reason: this.resons && this.resons.join('，'),
+						diningType: this.v.diningType,
+						storeId: this.v.storeId,
+						tableId: this.v.id,
+					})
+				} else {
+					uni.showToast({
+						title: this.$t('goods-components.refund_reason_enter'),
+						icon: 'none'
+					})
+				}
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.reduce {
+		position: absolute;
+		top: 10.4166vh;
+		left: 36.6032vw;
+		width: 28.5505vw;
+		height: calc(100vh - 19.5312vh);
+		border-radius: 10px;
+
+		.uScroll {
+			height: calc(100vh - 26.0416vh);
+			overflow: hidden;
+			overflow-y: scroll;
+		}
+
+		.tabs {
+			display: inline-flex;
+			border-radius: 6px;
+			background: #eeeeee;
+
+			.tab_i {
+				padding: 8px 15px;
+			}
+		}
+
+		.dis {
+			padding: 8px 0;
+			width: 23%;
+			border: 1px solid #e6e6e6;
+		}
+
+		.key {
+			/deep/.ljt-keyboard-body {
+				border-radius: 10px;
+				border: 1px solid #e5e5e5;
+
+				.ljt-keyboard-number-body {
+					width: 26.3543vw !important;
+					height: 25.8091vh !important;
+				}
+
+				.ljt-number-btn-confirm-2 {
+					background: #4275F4 !important;
+				}
+			}
+		}
+
+		.reson_i {
+			position: relative;
+			display: inline-block;
+			border: 1px solid #e6e6e6;
+			padding: 8px 15px;
+
+			.r_gou {
+				display: none;
+				position: absolute;
+				top: 0px;
+				right: 0px;
+				width: 0;
+				height: 0;
+				border-top: 10px solid #4275F4;
+				border-right: 10px solid #4275F4;
+				border-left: 10px solid transparent;
+				border-bottom: 10px solid transparent;
+			}
+
+			.icon-duigou {
+				display: none;
+				position: absolute;
+				top: -2px;
+				right: -2px;
+				transform: scale(0.6);
+			}
+		}
+
+		.acreson_i {
+			border: 1px solid #FD8906;
+			background: #fff9dd;
+
+			.r_gou,
+			.icon-duigou {
+				display: block;
+			}
+		}
+	}
+
+	@media (min-width: 1500px) and (max-width: 3280px) {
+		.reduce {
+			position: absolute;
+			top: 80px;
+			left: 500px;
+			width: 390px;
+			height: calc(100vh - 150px);
+			border-radius: 10px;
+
+			.uScroll {
+				height: calc(100vh - 200px);
+			}
+
+			.key {
+				/deep/.ljt-keyboard-body {
+					border-radius: 10px;
+					border: 1px solid #e5e5e5;
+
+					.ljt-keyboard-number-body {
+						width: 360px !important;
+						height: 275px !important;
+					}
+				}
+			}
+		}
+	}
+</style>
