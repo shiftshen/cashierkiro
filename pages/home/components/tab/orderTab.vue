@@ -54,7 +54,7 @@
 			border: 1px solid #4275F4;
 		}
 
-		// /deep/.u-tabs__wrapper__nav__item__text {
+		// ::v-deep(.u-tabs__wrapper__nav__item__text) {
 		// 	font-weight: bold;
 		// }
 	}

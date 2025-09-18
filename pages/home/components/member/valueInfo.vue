@@ -79,7 +79,7 @@
 		overflow-y: scroll;
 	}
 
-	/deep/.uni-pagination {
+	::v-deep(.uni-pagination) {
 		.page--active {
 			background: #4275F4 !important;
 			color: #fff !important;

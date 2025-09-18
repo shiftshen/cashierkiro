@@ -291,11 +291,11 @@
 <style lang="scss" scoped>
 	.tradeReport {
 
-		/deep/ .u-form-item__body {
+		::v-deep(.u-form-item__body) {
 			padding: 0;
 		}
 
-		/deep/.u-form {
+		::v-deep(.u-form) {
 			display: flex !important;
 			flex-wrap: wrap;
 
@@ -359,13 +359,13 @@
 			flex: 0;
 		}
 		
-		/deep/.uni-table{
+		::v-deep(.uni-table){
 		   min-width: auto !important;
 		}
 		
 		.pagona {
 		
-			/deep/.uni-pagination {
+			::v-deep(.uni-pagination) {
 				.page--active {
 					display: inline-block;
 					width: 2.1961vw;
@@ -413,7 +413,7 @@
 		}
 		.pagona {
 			
-			/deep/.uni-pagination {
+			::v-deep(.uni-pagination) {
 				.page--active {
 					width: 30px;
 					height: 30px;

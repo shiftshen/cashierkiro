@@ -133,7 +133,7 @@
 		width: 400px;
 		height: 550px;
 
-		/deep/.u-button {
+		::v-deep(.u-button) {
 			span {
 				font-size: 16px;
 				color: #000;
@@ -151,7 +151,7 @@
 			height: 350px;
 		}
 		.zfm{
-			/deep/.u-image {
+			::v-deep(.u-image) {
 			   height: 110px !important;
 			}
 		}

@@ -596,12 +596,12 @@
 	.top {
 		height: 7.1614vh;
 
-		/deep/.u-tabs__wrapper__nav__item__text {
+		::v-deep(.u-tabs__wrapper__nav__item__text) {
 			// font-size: 20px !important;
 		}
 	}
 
-	// /deep/.u-button {
+	// ::v-deep(.u-button) {
 	// 	span {
 	// 		color: #000;
 	// 	}
@@ -643,7 +643,7 @@
 		overflow-y: scroll;
 	}
 
-	// /deep/.u-transition {
+	// ::v-deep(.u-transition) {
 	// 	// left: 80px !important;
 	// 	left: 5.8565vw !important;
 	// }
@@ -667,7 +667,7 @@
 		.top {
 			height: 55px;
 
-			/deep/.u-tabs__wrapper__nav__item__text {
+			::v-deep(.u-tabs__wrapper__nav__item__text) {
 				font-size: 20px !important;
 			}
 		}
@@ -696,7 +696,7 @@
 			overflow: hidden;
 		}
 
-		// /deep/.u-transition {
+		// ::v-deep(.u-transition) {
 		// 	left: 80px !important;
 		// }
 

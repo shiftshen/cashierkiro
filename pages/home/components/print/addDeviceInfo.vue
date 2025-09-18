@@ -430,11 +430,11 @@
 </script>
 
 <style lang="scss" scoped>
-	/deep/.u-transition {
+	::v-deep(.u-transition) {
 		background-color: rgba(0, 0, 0, 0.1) !important;
 	}
 
-	/deep/.u-modal {
+	::v-deep(.u-modal) {
 		.u-modal__content {
 			justify-content: flex-start;
 		}
@@ -469,7 +469,7 @@
 				width: 19.3997vw;
 			}
 
-			/deep/.u-input {
+			::v-deep(.u-input) {
 				border: none !important;
 			}
 		}

@@ -861,11 +861,11 @@
 </script>
 
 <style lang="scss" scoped>
-	/deep/.u-modal__button-group__wrapper--confirm {
+	::v-deep(.u-modal__button-group__wrapper--confirm) {
 		background: #4275F4;
 	}
 
-	/deep/.u-modal__content__text {
+	::v-deep(.u-modal__content__text) {
 		font-size: 16px !important;
 		color: #000 !important;
 	}

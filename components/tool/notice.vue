@@ -114,7 +114,7 @@
 		width: 500px;
 		height: 100vh;
 
-		/deep/.u-tabs {
+		::v-deep(.u-tabs) {
 			.u-tabs__wrapper__nav__item {
 				padding-bottom: 15px;
 			}
@@ -128,7 +128,7 @@
 			}
 		}
 
-		/deep/.u-modal__content {
+		::v-deep(.u-modal__content) {
 			text-align: center;
 		}
 	}

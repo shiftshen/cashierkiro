@@ -125,7 +125,7 @@
 </script>
 
 <style lang="scss" scoped>
-	/deep/.u-button {
+	::v-deep(.u-button) {
 		span {
 			color: #000;
 		}
@@ -138,7 +138,7 @@
 			justify-content: space-between;
 			width: 500px;
 
-			/deep/.u-input {
+			::v-deep(.u-input) {
 				background: #f5f5f5;
 			}
 
@@ -160,7 +160,7 @@
 			display: flex;
 			justify-content: flex-end;
 
-			/deep/.u-button {
+			::v-deep(.u-button) {
 				width: 102px;
 				height: 42px;
 

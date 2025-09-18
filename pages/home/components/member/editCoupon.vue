@@ -111,19 +111,19 @@
 		width: 750px;
 		border-radius: 5px;
 
-		/deep/.u-form-item__body__left__content__label {
+		::v-deep(.u-form-item__body__left__content__label) {
 			justify-content: flex-end !important;
 		}
 
-		/deep/.u-input {
+		::v-deep(.u-input) {
 			padding: 3px 9px !important;
 		}
 
-		/deep/.uni-select__input-box {
+		::v-deep(.uni-select__input-box) {
 			height: 32px !important;
 		}
 
-		/deep/.uni-calendar__content {
+		::v-deep(.uni-calendar__content) {
 			position: absolute;
 			left: 50%;
 			transform: translateX(-50%);

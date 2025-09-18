@@ -195,7 +195,7 @@
 	.right {
 		position: relative;
 
-		/deep/.u-radio__text {
+		::v-deep(.u-radio__text) {
 			font-size: 18px !important;
 		}
 

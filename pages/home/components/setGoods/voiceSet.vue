@@ -83,7 +83,7 @@
 </script>
 
 <style lang="scss" scoped>
-	/deep/.uni-table-tr {
+	::v-deep(.uni-table-tr) {
 	  height: 50px;
 	}
 </style>

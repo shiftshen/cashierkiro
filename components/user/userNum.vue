@@ -111,11 +111,11 @@
 		width: 450px;
 		// height: 416px;
 
-		/deep/.u-input {
+		::v-deep(.u-input) {
 			padding: 9px !important;
 		}
 
-		/deep/.ljt-keyboard-body {
+		::v-deep(.ljt-keyboard-body) {
 			border: 1px solid #e5e5e5;
 
 			.ljt-keyboard-number-body {
@@ -133,7 +133,7 @@
 			}
 		}
 
-		/deep/.u-input__content__field-wrapper__field {
+		::v-deep(.u-input__content__field-wrapper__field) {
 			font-size: 22px !important;
 			font-weight: bold;
 		}
@@ -144,7 +144,7 @@
 	}
 	@media (min-width: 500px) and (max-width: 900px) {
 		.cash { 
-			/deep/.ljt-keyboard-body {
+			::v-deep(.ljt-keyboard-body) {
 				.ljt-keyboard-number-body {
 					height: 150px !important;
 				}

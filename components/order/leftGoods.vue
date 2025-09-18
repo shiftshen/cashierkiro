@@ -405,11 +405,11 @@
 			background: #fff9ec;
 		}
 
-		/deep/.u-empty {
+		::v-deep(.u-empty) {
 			height: 65.1041vh;
 		}
 
-		/deep/.u-tag-wrapper {
+		::v-deep(.u-tag-wrapper) {
 			width: 1.6837vw;
 
 			span {
@@ -423,11 +423,11 @@
 			}
 		}
 
-		/deep/.u-button {
+		::v-deep(.u-button) {
 			border-radius: 6px !important;
 		}
 
-		/deep/.checkbox {
+		::v-deep(.checkbox) {
 			width: 10px !important;
 
 			.checkbox--indeterminate,
@@ -466,11 +466,11 @@
 				background: #fff9ec;
 			}
 
-			/deep/.u-empty {
+			::v-deep(.u-empty) {
 				height: 500px;
 			}
 
-			/deep/.u-tag-wrapper {
+			::v-deep(.u-tag-wrapper) {
 				width: 23px;
 
 				span {
@@ -484,11 +484,11 @@
 				}
 			}
 
-			/deep/.u-button {
+			::v-deep(.u-button) {
 				border-radius: 6px !important;
 			}
 
-			/deep/.checkbox {
+			::v-deep(.checkbox) {
 				width: 10px !important;
 
 				.checkbox--indeterminate,

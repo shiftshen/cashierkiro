@@ -93,7 +93,7 @@
 		height: 100vh;
 		overflow-y: auto;
 
-		/deep/.u-subsection {
+		::v-deep(.u-subsection) {
 			height: 40px;
 			border-radius: 6px;
 

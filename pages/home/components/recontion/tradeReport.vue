@@ -635,7 +635,7 @@
 			flex: 0;
 		}
 
-		/deep/.uni-table {
+		::v-deep(.uni-table) {
 			min-width: auto !important;
 		}
 

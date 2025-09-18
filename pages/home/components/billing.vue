@@ -1022,7 +1022,7 @@
 		width: 30vw;
 		border-radius: 0 6px 0 0;
 
-		/deep/.u-button {
+		::v-deep(.u-button) {
 			span {
 				color: #fff;
 			}
@@ -1051,7 +1051,7 @@
 
 	@media (min-width: 500px) and (max-width: 900px) {
 		.isOrder_media {
-			/deep/.u-button--normal {
+			::v-deep(.u-button--normal) {
 				padding: 0 !important;
 			}
 		}

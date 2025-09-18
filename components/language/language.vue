@@ -108,7 +108,7 @@
 </script>
 
 <style lang="scss" scoped>
-	/deep/.u-button__text {
+	::v-deep(.u-button__text) {
 		font-size: 17px !important;
 		font-weight: 700 !important;
 	}

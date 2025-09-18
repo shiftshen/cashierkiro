@@ -69,11 +69,11 @@
 </script>
 
 <style lang="scss" scoped>
-	/deep/.u-transition {
+	::v-deep(.u-transition) {
 		background-color: rgba(0, 0, 0, 0.1) !important;
 	}
 
-	/deep/.u-modal {
+	::v-deep(.u-modal) {
 		.u-modal__content {
 			justify-content: flex-start;
 		}
@@ -109,7 +109,7 @@
 		}
 
 		.key {
-			/deep/.ljt-keyboard-body {
+			::v-deep(.ljt-keyboard-body) {
 				border-radius: 10px;
 				border: 1px solid #e5e5e5;
 

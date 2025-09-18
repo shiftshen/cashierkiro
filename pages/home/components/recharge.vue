@@ -229,7 +229,7 @@
 				width: 55px;
 			}
 
-			/deep/.ul-button {
+			::v-deep(.ul-button) {
 				.u-button__text {
 					font-size: 18px !important;
 				}
@@ -244,7 +244,7 @@
 				background: rgba(#fff0a9, .4);
 			}
 
-			/deep/.u-empty {
+			::v-deep(.u-empty) {
 				height: 500px;
 			}
 		}
@@ -261,7 +261,7 @@
 		}
 
 		.acc {
-			/deep/.u-button {
+			::v-deep(.u-button) {
 				width: 60px !important;
 				height: 35px;
 			}
@@ -271,7 +271,7 @@
 	.right {
 		position: relative;
 
-		/deep/.u-radio__text {
+		::v-deep(.u-radio__text) {
 			font-size: 18px !important;
 		}
 

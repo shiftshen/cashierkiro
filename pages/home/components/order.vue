@@ -1409,7 +1409,7 @@
 		overflow-x: scroll;
 	}
 
-	/deep/.uni-pagination {
+	::v-deep(.uni-pagination) {
 		.page--active {
 			// display: inline-block;
 			// width: 2.1961vw;
@@ -1459,7 +1459,7 @@
 			width: 14.6412vw;
 		}
 
-		/deep/.u-form {
+		::v-deep(.u-form) {
 			display: flex !important;
 			// overflow-x: scroll;
 			flex-wrap: wrap;

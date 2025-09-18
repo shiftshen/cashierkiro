@@ -79,14 +79,14 @@
 	// 		padding: 35rpx 24rpx;
 	// 		background-color: #fff;
 
-	// 		/deep/.u-tag--medium {
+	// 		::v-deep(.u-tag--medium) {
 	// 			margin-left: 8px;
 	// 			height: 18px;
 	// 			line-height: 18px;
 	// 			padding: 0 5px;
 	// 		}
 
-	// 		/deep/.u-tag__text--medium {
+	// 		::v-deep(.u-tag__text--medium) {
 	// 			font-size: 12px;
 	// 		}
 	// 	}

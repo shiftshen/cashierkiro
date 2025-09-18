@@ -145,12 +145,12 @@
 <style lang="scss" scoped>
 	.right {
 		.spsz {
-			/deep/.u-form-item__body__left {
+			::v-deep(.u-form-item__body__left) {
 				align-items: flex-start;
 			}
 		}
 
-		/deep/.u-form {
+		::v-deep(.u-form) {
 			.u-form-item {
 				margin-bottom: 10px;
 			}

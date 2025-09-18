@@ -401,7 +401,7 @@
 			width: 14.6412vw;
 		}
 
-		/deep/.u-form {
+		::v-deep(.u-form) {
 			display: flex !important;
 			flex-wrap: wrap;
 
@@ -447,7 +447,7 @@
 
 	.pagona {
 
-		/deep/.uni-pagination {
+		::v-deep(.uni-pagination) {
 			.page--active {
 				display: inline-block;
 				width: 2.1961vw;
@@ -476,7 +476,7 @@
 		}
 	}
 	
-	/deep/.uni-table{
+	::v-deep(.uni-table){
 	   min-width: auto !important;
 	}
 	
@@ -498,7 +498,7 @@
 
 		.pagona {
 
-			/deep/.uni-pagination {
+			::v-deep(.uni-pagination) {
 				.page--active {
 					width: 30px;
 					height: 30px;

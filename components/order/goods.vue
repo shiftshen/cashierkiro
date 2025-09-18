@@ -231,7 +231,7 @@
 				top: 0px;
 				right: 0px;
 
-				/deep/.u-badge {
+				::v-deep(.u-badge) {
 					line-height: 16px;
 					font-size: 14px;
 					// width: 1.4641vw;
@@ -265,7 +265,7 @@
 		box-shadow: 0 0 8px 0 #ddd;
 		height: 50px;
 
-		/deep/.uni-pagination {
+		::v-deep(.uni-pagination) {
 			.page--active {
 				display: inline-block;
 				// width: 30px;
@@ -350,7 +350,7 @@
 					top: 0px;
 					right: 0px;
 
-					/deep/.u-badge {
+					::v-deep(.u-badge) {
 						line-height: 16px;
 						font-size: 14px;
 						// width: 20px;
@@ -384,7 +384,7 @@
 			box-shadow: 0 0 8px 0 #ddd;
 			height: 50px;
 
-			/deep/.uni-pagination {
+			::v-deep(.uni-pagination) {
 				.page--active {
 					width: 30px;
 					height: 30px;

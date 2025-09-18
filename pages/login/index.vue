@@ -228,7 +228,7 @@
 			width: 36.6032vw;
 			height: 65.1041vh;
 
-			/deep/.u-tabs__wrapper__nav__item__text {
+			::v-deep(.u-tabs__wrapper__nav__item__text) {
 				font-size: 18px;
 				color: #000;
 			}

@@ -137,7 +137,7 @@
 			}
 		}
 		
-		/deep/ .u-alert__content__title{
+		::v-deep(.u-alert__content__title){
 		    font-weight: normal;
 		}
 	}

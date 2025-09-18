@@ -251,7 +251,7 @@
 		left: 0;
 		z-index: 99;
 
-		/deep/.ljt-keyboard-body {
+		::v-deep(.ljt-keyboard-body) {
 			border-radius: 6px;
 			border: 1px solid #e5e5e5;
 

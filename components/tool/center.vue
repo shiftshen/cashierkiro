@@ -284,18 +284,18 @@
 		height: 100vh;
 		overflow: scroll;
 
-		/deep/.u-cell__body--large {
+		::v-deep(.u-cell__body--large) {
 			padding-left: 0;
 			padding-right: 0;
 		}
 
-		/deep/.u-cell__value--large {
+		::v-deep(.u-cell__value--large) {
 			color: #999;
 			font-size: 16px;
 		}
 	}
 
-	/deep/.u-modal {
+	::v-deep(.u-modal) {
 		.u-modal__content__text {
 			padding: 10px 0;
 			font-size: 18px;

@@ -153,7 +153,7 @@
 		overflow-y: scroll;
 	}
 
-	/deep/.u-form {
+	::v-deep(.u-form) {
 		display: flex !important;
 		flex-wrap: wrap;
 
@@ -183,14 +183,14 @@
 		}
 	}
 
-	/deep/.uni-pagination {
+	::v-deep(.uni-pagination) {
 		.page--active {
 			background: #4275F4 !important;
 			color: #fff !important;
 		}
 	}
 
-	/deep/.u-modal__button-group__wrapper--confirm {
+	::v-deep(.u-modal__button-group__wrapper--confirm) {
 		background: #4275F4;
 	}
 

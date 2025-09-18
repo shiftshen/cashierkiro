@@ -233,7 +233,7 @@
 			margin: 0 auto;
 		}
 
-		/deep/.u-button {
+		::v-deep(.u-button) {
 			padding: 10px;
 			// width: 80px;
 			// height: 75px !important;
@@ -245,7 +245,7 @@
 			}
 		}
 
-		/deep/ .gift {
+		::v-deep(.gift) {
 			.u-button__text {
 				font-size: 14px !important;
 			}
@@ -255,7 +255,7 @@
 			background: #4275F4;
 		}
 
-		/deep/.u-number-box {
+		::v-deep(.u-number-box) {
 			display: flex;
 			flex-direction: column;
 			margin-bottom: 10px;
@@ -313,11 +313,11 @@
 				}
 			}
 		}
-		// /deep/.u-input{
+		// ::v-deep(.u-input){
 		// 	width: 100%;
 		// 	height: 100%;
 		// }
-		// /deep/.u-input__content__field-wrapper__field{
+		// ::v-deep(.u-input__content__field-wrapper__field){
 		// 	text-align: center !important;
 		// 	font-size: 24px !important;
 		// }
@@ -343,12 +343,12 @@
 	}
 
 	.badge {
-		/deep/.u-badge {
+		::v-deep(.u-badge) {
 			line-height: 16px;
 			font-size: 16px;
 		}
 
-		/deep/.u-badge span {
+		::v-deep(.u-badge) span {
 			color: #fff !important;
 		}
 	}
@@ -363,7 +363,7 @@
 				width: 80px;
 			}
 
-			/deep/.u-button {
+			::v-deep(.u-button) {
 				padding: 10px;
 				width: 80px;
 				height: 75px !important;
@@ -373,7 +373,7 @@
 				}
 			}
 
-			/deep/ .gift {
+			::v-deep(.gift) {
 				.u-button__text {
 					font-size: 14px !important;
 				}
@@ -383,7 +383,7 @@
 				background: #4275F4;
 			}
 
-			/deep/.u-number-box {
+			::v-deep(.u-number-box) {
 				display: flex;
 				flex-direction: column;
 				margin-bottom: 10px;

@@ -184,11 +184,11 @@
 			justify-content: space-between;
 			width: 500px;
 
-			/deep/.u-input {
+			::v-deep(.u-input) {
 				background: #f5f5f5;
 			}
 
-			/deep/.u-subsection {
+			::v-deep(.u-subsection) {
 				height: 35px;
 
 				.u-subsection__item__text {

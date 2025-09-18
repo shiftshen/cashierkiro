@@ -80,7 +80,7 @@
 
 <style lang="scss" scoped>
 	.right {
-		/deep/.u-subsection--subsection {
+		::v-deep(.u-subsection--subsection) {
 			height: 40px !important;
 			border-radius: 6px;
 
@@ -93,7 +93,7 @@
 		}
 
 
-		// /deep/.ljt-keyboard-body {
+		// ::v-deep(.ljt-keyboard-body) {
 		// 	border-radius: 6px;
 		// 	border: 1px solid #e5e5e5;
 
@@ -140,14 +140,14 @@
 		}
 
 		.r_b {
-			/deep/.u-button {
+			::v-deep(.u-button) {
 				span {
 					color: #000;
 				}
 			}
 		}
 
-		/deep/.u-cell__body {
+		::v-deep(.u-cell__body) {
 			padding: 0 0 15px;
 
 			span {
@@ -198,7 +198,7 @@
 			box-shadow: 0px 0px 10px 0px #e6e6e6;
 		}
 
-		/deep/.u-cell__title-text {
+		::v-deep(.u-cell__title-text) {
 			span {
 				color: #666;
 			}

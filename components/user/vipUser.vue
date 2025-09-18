@@ -164,7 +164,7 @@
 			width: 55px;
 		}
 
-		/deep/.ul-button {
+		::v-deep(.ul-button) {
 			.u-button__text {
 				font-size: 18px !important;
 			}

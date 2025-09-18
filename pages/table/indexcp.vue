@@ -745,11 +745,11 @@
 </script>
 
 <style lang="scss" scoped>
-	/deep/.u-modal__button-group__wrapper--confirm {
+	::v-deep(.u-modal__button-group__wrapper--confirm) {
 		background: #4275F4;
 	}
 
-	/deep/.u-modal__content__text {
+	::v-deep(.u-modal__content__text) {
 		font-size: 16px !important;
 		color: #000 !important;
 	}
@@ -768,7 +768,7 @@
 			color: #f9f9f9;
 		}
 
-		/deep/.u-input {
+		::v-deep(.u-input) {
 			padding: 3px 9px !important;
 			background: #434453 !important;
 
@@ -794,7 +794,7 @@
 				width: 55px;
 			}
 
-			/deep/.ul-button {
+			::v-deep(.ul-button) {
 				.u-button__text {
 					font-size: 18px !important;
 				}
@@ -816,11 +816,11 @@
 				background: #fff9ec;
 			}
 
-			/deep/.u-empty {
+			::v-deep(.u-empty) {
 				height: 500px;
 			}
 
-			/deep/.u-tag-wrapper {
+			::v-deep(.u-tag-wrapper) {
 				width: 25px;
 
 				span {
@@ -828,11 +828,11 @@
 				}
 			}
 
-			/deep/.u-button {
+			::v-deep(.u-button) {
 				border-radius: 6px !important;
 			}
 
-			/deep/.checkbox {
+			::v-deep(.checkbox) {
 				width: 10px !important;
 
 				.checkbox--indeterminate,
@@ -854,7 +854,7 @@
 		overflow-y: auto;
 		background: #eff0f4;
 
-		/deep/.u-button {
+		::v-deep(.u-button) {
 			padding: 10px;
 			width: 80px;
 			height: 75px !important;
@@ -864,7 +864,7 @@
 			}
 		}
 
-		/deep/ .gift {
+		::v-deep(.gift) {
 			.u-button__text {
 				font-size: 14px !important;
 			}
@@ -874,7 +874,7 @@
 			background: #4275F4;
 		}
 
-		/deep/.u-number-box {
+		::v-deep(.u-number-box) {
 			display: flex;
 			flex-direction: column;
 			margin-bottom: 10px;
@@ -944,7 +944,7 @@
 	}
 
 	.right {
-		/deep/.u-subsection--subsection {
+		::v-deep(.u-subsection--subsection) {
 			height: 40px !important;
 			border-radius: 6px;
 
@@ -975,7 +975,7 @@
 					top: 0px;
 					right: 0px;
 
-					/deep/.u-badge {
+					::v-deep(.u-badge) {
 						line-height: 16px;
 						font-size: 16px;
 					}
@@ -990,7 +990,7 @@
 		.pagona {
 			height: 50px;
 
-			/deep/.uni-pagination {
+			::v-deep(.uni-pagination) {
 				.page--active {
 					display: inline-block;
 					width: 30px;
@@ -1010,7 +1010,7 @@
 		}
 
 
-		/deep/.ljt-keyboard-body {
+		::v-deep(.ljt-keyboard-body) {
 			border: 1px solid #e5e5e5;
 
 			.ljt-keyboard-number-body {
@@ -1038,7 +1038,7 @@
 		}
 
 		.r_b {
-			/deep/.u-button {
+			::v-deep(.u-button) {
 				span {
 					color: #000;
 				}
@@ -1075,7 +1075,7 @@
 		}
 
 		.key {
-			/deep/.ljt-keyboard-body {
+			::v-deep(.ljt-keyboard-body) {
 				border-radius: 10px;
 				border: 1px solid #e5e5e5;
 

@@ -113,7 +113,7 @@
 			color: #f9f9f9;
 		}
 
-		.search /deep/.u-input {
+		.search ::v-deep(.u-input) {
 			padding: 3px 9px !important;
 			background: rgba(109,151,255, .9) !important;
 

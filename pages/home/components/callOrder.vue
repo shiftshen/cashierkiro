@@ -323,7 +323,7 @@
 			background: #1c9945;
 		}
 
-		/deep/.u-form {
+		::v-deep(.u-form) {
 			display: flex !important;
 			flex-wrap: wrap;
 
@@ -354,7 +354,7 @@
 		}
 
 		.pagona {
-			/deep/.uni-pagination {
+			::v-deep(.uni-pagination) {
 				.page--active {
 					display: inline-block;
 					width: 2.1961vw;
@@ -412,7 +412,7 @@
 
 			.pagona {
 
-				/deep/.uni-pagination {
+				::v-deep(.uni-pagination) {
 					.page--active {
 						width: 30px;
 						height: 30px;

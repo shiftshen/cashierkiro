@@ -110,7 +110,7 @@
 </script>
 
 <style lang="scss" scoped>
-	// /deep/.u-button {
+	// ::v-deep(.u-button) {
 	// 	span {
 	// 		color: #000;
 	// 	}
@@ -123,7 +123,7 @@
 	// 		justify-content: space-between;
 	// 		width: 500px;
 
-	// 		/deep/.u-input {
+	// 		::v-deep(.u-input) {
 	// 			background: #f5f5f5;
 	// 		}
 
@@ -142,19 +142,19 @@
 		.selecthx {
 			height: 100%;
 
-			/deep/ .uni-stat__select {
+			::v-deep(.uni-stat__select) {
 				height: 100%;
 			}
 
-			/deep/ .uni-select {
+			::v-deep(.uni-select) {
 				height: 100%;
 			}
 
-			/deep/ .uni-stat__actived {
+			::v-deep(.uni-stat__actived) {
 				height: 100%;
 			}
 
-			/deep/ .uni-select__input-box {
+			::v-deep(.uni-select__input-box) {
 				height: 100%;
 			}
 		}

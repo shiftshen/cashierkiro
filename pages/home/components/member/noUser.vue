@@ -100,11 +100,11 @@
 	.cash {
 		width: 32.9428vw;
 
-		/deep/.u-input {
+		::v-deep(.u-input) {
 			padding: 9px !important;
 		}
 
-		/deep/.ljt-keyboard-body {
+		::v-deep(.ljt-keyboard-body) {
 			border: 1px solid #e5e5e5;
 
 			.ljt-keyboard-number-body {
@@ -117,7 +117,7 @@
 			}
 		}
 
-		/deep/.u-input__content__field-wrapper__field {
+		::v-deep(.u-input__content__field-wrapper__field) {
 			font-size: 1.6105vw !important;
 			font-weight: bold;
 		}
@@ -131,11 +131,11 @@
 		.cash {
 			width: 450px;
 
-			/deep/.u-input {
+			::v-deep(.u-input) {
 				padding: 9px !important;
 			}
 
-			/deep/.ljt-keyboard-body {
+			::v-deep(.ljt-keyboard-body) {
 				border: 1px solid #e5e5e5;
 
 				.ljt-keyboard-number-body {
@@ -145,7 +145,7 @@
 
 			}
 
-			/deep/.u-input__content__field-wrapper__field {
+			::v-deep(.u-input__content__field-wrapper__field) {
 				font-size: 22px !important;
 			}
 

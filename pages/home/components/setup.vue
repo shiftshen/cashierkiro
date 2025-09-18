@@ -83,7 +83,7 @@
 
 <style lang="scss" scoped>
 	.right {
-		/deep/.u-form {
+		::v-deep(.u-form) {
 			.u-form-item {
 				margin-bottom: 10px;
 			}
@@ -98,7 +98,7 @@
 			}
 		}
 
-		/deep/.u-button {
+		::v-deep(.u-button) {
 			span {
 				color: #000;
 			}

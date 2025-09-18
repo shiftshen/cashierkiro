@@ -236,7 +236,7 @@
 			}
 		}
 
-		/deep/.uni-select {
+		::v-deep(.uni-select) {
 			height: 40px;
 			background: #fff;
 

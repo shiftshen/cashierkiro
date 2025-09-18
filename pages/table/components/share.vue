@@ -204,11 +204,11 @@
 		width: 400px;
 		// height: 410px;
 
-		/deep/.u-form-item__body {
+		::v-deep(.u-form-item__body) {
 			padding: 15px 0;
 		}
 
-		/deep/.ljt-keyboard-body {
+		::v-deep(.ljt-keyboard-body) {
 			border-left: 2px solid #e5e5e5;
 
 			.ljt-keyboard-number-body {
@@ -264,12 +264,12 @@
 		}
 	}
 
-	/deep/.u-toast {
+	::v-deep(.u-toast) {
 		position: absolute;
 		z-index: 99999999;
 	}
 
-	/deep/.u-modal {
+	::v-deep(.u-modal) {
 		border: 1px solid #e6e6e6 !important;
 		box-shadow: 0 0 10px 0 rgba(#000, .5);
 

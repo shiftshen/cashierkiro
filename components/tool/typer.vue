@@ -199,7 +199,7 @@
 		}
 	}
 
-	/deep/.u-popup__content {
+	::v-deep(.u-popup__content) {
 		background: none;
 	}
 
