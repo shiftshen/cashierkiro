@@ -241,12 +241,16 @@
 				})
 			},
 			
-			init() {
+			async init() {
 				this.setVip({})
 				console.log('34')
 				this.form.diningType = 6
 				this.form.storeId = this.storeId
 				this.form.id = 0
+				
+				// 设置性能优化
+				await this.setupOptimizedSearch()
+				
 				this.cashieSetting()
 				this.getCategory()
 				// this.getCar()
@@ -368,9 +372,27 @@
 			// 	// this.carList = data ? data : {},
 			// 	// this.list = data ? data.goodsList : []
 			// },
+			// 优化搜索功能 - 使用防抖
+			async setupOptimizedSearch() {
+				try {
+					const optimizer = await import('@/common/main-thread-optimizer.js').then(m => m.default)
+					this.debouncedSearch = optimizer.createDebouncedSearch(async (keyword) => {
+						this.queryForm.keyword = keyword
+						await this.fetchData()
+					}, 300)
+				} catch (error) {
+					console.error('搜索优化器加载失败:', error)
+				}
+			},
+			
 			search(n) {
-				this.queryForm.keyword = n
-				this.fetchData()
+				if (this.debouncedSearch) {
+					this.debouncedSearch(n)
+				} else {
+					// 降级到普通搜索
+					this.queryForm.keyword = n
+					this.fetchData()
+				}
 			},
 			//切换种类
 			changeKind(v, i) {

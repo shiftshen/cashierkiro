@@ -223,8 +223,77 @@
 				}
 			},
 			
-			// 检测餐桌状态变化
-			detectTableChanges(oldTables, newTables) {
+			// 检测餐桌状态变化 (优化版本)
+			async detectTableChanges(oldTables, newTables) {
+				// 如果数据量大，使用主线程优化器
+				if (oldTables.length > 100 || newTables.length > 100) {
+					try {
+						const optimizer = await import('@/common/main-thread-optimizer.js').then(m => m.default)
+						
+						return await optimizer.runInWorker(`
+							function taskFunction(data) {
+								const { oldTables, newTables } = data
+								const changes = []
+								
+								// 创建旧数据的映射
+								const oldTableMap = new Map()
+								oldTables.forEach(table => {
+									oldTableMap.set(table.id, table)
+								})
+								
+								// 检查新数据中的变化
+								newTables.forEach(newTable => {
+									const oldTable = oldTableMap.get(newTable.id)
+									
+									if (!oldTable) {
+										changes.push({
+											type: 'added',
+											table: newTable
+										})
+									} else if (hasTableChanged(oldTable, newTable)) {
+										changes.push({
+											type: 'updated',
+											table: newTable,
+											oldTable: oldTable
+										})
+									}
+								})
+								
+								// 检查被删除的桌台
+								oldTables.forEach(oldTable => {
+									const exists = newTables.find(t => t.id === oldTable.id)
+									if (!exists) {
+										changes.push({
+											type: 'removed',
+											table: oldTable
+										})
+									}
+								})
+								
+								function hasTableChanged(oldTable, newTable) {
+									const keyFields = ['state', 'people', 'minutes', 'scan', 'order']
+									
+									for (const field of keyFields) {
+										if (field === 'order') {
+											const oldMoney = oldTable.order?.money || 0
+											const newMoney = newTable.order?.money || 0
+											if (oldMoney !== newMoney) return true
+										} else {
+											if (oldTable[field] !== newTable[field]) return true
+										}
+									}
+									return false
+								}
+								
+								return changes
+							}
+						`, { oldTables, newTables })
+					} catch (error) {
+						console.warn('Worker处理失败，使用主线程:', error)
+					}
+				}
+				
+				// 小数据量或Worker失败时的主线程处理
 				const changes = []
 				
 				// 创建旧数据的映射

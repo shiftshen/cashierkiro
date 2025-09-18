@@ -73,6 +73,9 @@
 		
 		<!-- PWA管理器 -->
 		<pwa-manager />
+		
+		<!-- 性能监控面板 (开发模式) -->
+		<performance-dashboard v-if="showPerformanceDashboard" @close="showPerformanceDashboard = false" />
 		<view v-if="show">
 			<u-popup :show="isMore" mode="left" @close="isMore=false">
 				<view class="mode f20">
@@ -157,6 +160,12 @@
 			center,
 			openShare,
 			PWAManager,
+			
+			// 性能监控组件 (按需加载)
+			PerformanceDashboard: () => createAsyncComponent(
+				() => import('@/components/performance/performance-dashboard.vue'),
+				{ delay: 300 }
+			),
 			
 			// 业务组件异步加载
 			billing: () => createAsyncComponent(
@@ -244,6 +253,8 @@
 				version: "1.3.3",
 				show: false,
 				isMore: false,
+				// 性能监控面板显示状态
+				showPerformanceDashboard: false,
 				isType: false, //打印机
 				isNotice: false, //消息
 				isCenter: false, //个人中心
