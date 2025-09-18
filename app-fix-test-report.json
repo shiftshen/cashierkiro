@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-09-18T22:31:58.757Z",
+  "totalChecks": 5,
+  "passedChecks": 5,
+  "successRate": 100,
+  "checks": [
+    {
+      "name": "异步组件加载器修复",
+      "file": "common/async-component-loader.js",
+      "passed": true
+    },
+    {
+      "name": "主页面组件导入修复",
+      "file": "pages/home/index.vue",
+      "passed": true
+    },
+    {
+      "name": "用户角色默认值修复",
+      "file": "pages/home/index.vue",
+      "passed": true
+    },
+    {
+      "name": "PWA管理器暂时禁用",
+      "file": "pages/home/index.vue",
+      "passed": true
+    },
+    {
+      "name": "Store用户数据初始化",
+      "file": "store/index.js",
+      "passed": true
+    }
+  ]
+}
