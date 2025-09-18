@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Test</title>
+</head>
+<body>
+    <h1>测试页面</h1>
+    <p>如果你能看到这个页面，说明服务器运行正常</p>
+    
+    <script>
+        console.log('测试脚本运行正常');
+        
+        // 测试加载编译后的文件
+        fetch('./unpackage/dist/build/web/static/js/index.cab1356c.js')
+            .then(response => {
+                console.log('JS文件状态:', response.status);
+                if (response.ok) {
+                    console.log('✅ JS文件加载正常');
+                } else {
+                    console.error('❌ JS文件加载失败');
+                }
+            })
+            .catch(error => {
+                console.error('❌ JS文件请求失败:', error);
+            });
+            
+        // 测试加载CSS文件
+        fetch('./unpackage/dist/build/web/static/index.2da1efab.css')
+            .then(response => {
+                console.log('CSS文件状态:', response.status);
+                if (response.ok) {
+                    console.log('✅ CSS文件加载正常');
+                } else {
+                    console.error('❌ CSS文件加载失败');
+                }
+            })
+            .catch(error => {
+                console.error('❌ CSS文件请求失败:', error);
+            });
+    </script>
+</body>
+</html>
