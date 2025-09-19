@@ -49,7 +49,7 @@ import {
 	// import cash from '@/components/pay/cash.vue';
 	import share from '../../table/components/share.vue';
 	import VirtualTableList from '@/components/virtual-scroll/virtual-table-list.vue';
-	export default ({
+	export default {
 		components: {
 			// cash,
 			share,
@@ -165,7 +165,6 @@ import {
 					console.log('🚀 餐桌智能轮询已启动')
 				})
 			},
-			async 
 		async fetchData() {
 			try {
 				// 使用模拟数据
@@ -533,7 +532,7 @@ import {
 				this.getTableList()
 			}
 		}
-	})
+	}
 </script>
 
 <style lang="scss" scoped>
