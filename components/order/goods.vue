@@ -27,17 +27,11 @@
 										<text class="f18">{{v.price}}</text>
 										<text class="f12 ml5">{{$t('order-components.per')}}</text>
 									</text>
-									<!-- <text v-else>
-										{{ v.mixPrice }}~{{ v.maxPrice }}
-									</text> -->
 								</view>
 								<view v-else class="mb5 c0 f18 overflowlnr">
 									<text class="f12">฿</text>
 									<text class="f18">{{v.price}}</text>
 								</view>
-								<!-- <view class="c9 dfa">
-									<text class="f12 pr5" v-if="v.specSwitch == 0">库存:{{ v.singleSpec && v.singleSpec.surplusInventory }}</text>
-								</view> -->
 							</view>
 						</view>
 					</view>
@@ -64,9 +58,6 @@
 									<text class="f18">{{v.price}}</text>
 									<text class="ml5">{{$t('order-components.per')}}</text>
 								</text>
-								<!-- <text v-else>
-									{{ v.mixPrice }}~{{ v.maxPrice }}
-								</text> -->
 							</view>
 							<view v-else class="mb5 c0 f18 overflowlnr">
 								<text class="f12">฿</text>

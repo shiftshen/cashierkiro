@@ -133,7 +133,7 @@
 						this.getTableList()
 						this.getTableConunt()
 					}
-				}, 3000)
+				}, 5000)
 			},
 			
 			async fetchData() {
