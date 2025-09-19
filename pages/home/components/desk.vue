@@ -6,37 +6,36 @@
 					<view :class="tab==index?'istab':''" class="tab tac f16" v-for="(item,index) in tabs" :key="index"
 						@click="changeTab(item,index)">{{item.name}}</view>
 				</view>
-				<!-- <view style="width: 250px;">
-					<uni-data-select v-model="select" :localdata="selects" @change="change"></uni-data-select>
-				</view> -->
 			</view>
-			<!-- 餐桌列表 - 临时使用简单版本进行调试 -->
-			<view class="tables" v-if="tabelList && tabelList.length > 0">
-				<view 
-					v-for="(item, index) in tabelList" 
-					:key="item.id"
-					class="table-item"
-					:class="getTableStatusClass(item.status)"
-					@click="clickItem(item)"
-				>
-					<view class="table-name">{{ item.name }}</view>
-					<view class="table-capacity">{{ item.capacity }}人桌</view>
-					<view class="table-status">{{ getTableStatusText(item.status) }}</view>
+			
+			<!-- 餐桌列表 -->
+			<view class="tables">
+				<view class="table mr15 mb15 bf pt15 f-y-bt"
+					:class="v.state==0?'bf c0':v.state==1?'b23 cf':v.state==2?'bb3 cf':v.state==3?'b2e cf':v.state==4?'bdb cf':'bf c0'"
+					v-for="(v,i) in tabelList" :key="i" @click="clickItem(v,i)">
+					<view class="f-bt">
+						<view class="p-0-15 f16 mb15 t-o-e">{{v.name}}</view>
+						<view class="p-0-15 sm f14 mr10" v-if="v.scan==1"
+							:style="{color:v.state==2?'#FF4C54':v.state==1?'#3E9949':v.state==3?'#2979ff':v.state==4?'#DC6523':''}">
+							{{$t('desk.scan_code')}}
+						</view>
+					</view>
+					<view v-if="v.state==1" class="p-0-15 f16 mb15">{{$t('desk.pending_order')}}</view>
+					<view v-else-if="v.order && v.order.money" class="p-0-15 f16 mb15">฿{{v.order.money}}</view>
+					<view class="p10 f-x-bt f14 bottom" style="background: rgba(#000,.3)">
+						<view class="f-y-c">
+							<text class="iconfont icon-wode" style="font-size: 14px;"></text>
+							{{ v.people || 0 }}/{{v.type.max}}
+						</view>
+						<view v-if="v.minutes" class="nowrap f-y-c">
+							<text class="iconfont icon-shalou" style="font-size: 14px;"></text>
+							{{v.minutes}}{{$t('desk.minutes')}}
+						</view>
+					</view>
 				</view>
 			</view>
 			
-			<!-- 调试信息 -->
-			<view v-else class="debug-info">
-				<text>🔍 调试信息:</text><br>
-				<text>餐桌数据长度: {{ tabelList ? tabelList.length : 'undefined' }}</text><br>
-				<text>餐桌数据内容: {{ JSON.stringify(tabelList) }}</text><br>
-				<text>当前区域ID: {{ areaId }}</text><br>
-				<text>区域列表: {{ JSON.stringify(tabs) }}</text><br>
-				<text>当前状态筛选: {{ state || '全部' }}</text><br>
-				<text>加载状态: {{ tableLoading ? '加载中' : '已完成' }}</text><br>
-				<button @click="debugLoadData" class="debug-btn">重新加载数据</button>
-				<button @click="debugShowApiData" class="debug-btn">显示API数据</button>
-			</view>
+			<!-- 底部统计 -->
 			<view class="p-15-13 f-x-bt bs6 bf kinds">
 				<view :class="kind==index?'isKind wei6':''" class="kind f16 tac" v-for="(item,index) in nav"
 					:key="index" @click="changeKind(item,index)">
@@ -47,26 +46,20 @@
 				</view>
 			</view>
 		</view>
-		<!-- <cash ref="codeRef" :t='2' tx="开台" @changeMoney="confirm" /> -->
 		<share ref="shareRef" @save="confirm" />
 	</view>
 </template>
 
 <script>
-	
-// 移除模拟数据导入，使用真实API数据
-import {
+	import {
 		mapState,
 		mapMutations,
 	} from 'vuex'
-	// import cash from '@/components/pay/cash.vue';
 	import share from '../../table/components/share.vue';
-	import VirtualTableList from '@/components/virtual-scroll/virtual-table-list.vue';
+	
 	export default {
 		components: {
-			// cash,
 			share,
-			VirtualTableList,
 		},
 		data() {
 			return {
@@ -77,7 +70,6 @@ import {
 					value: 0,
 					text: this.$t('desk.table_operations')
 				}],
-				//empty空桌台 order待下单 account待结账 accounted已预结 cleared待清台
 				nav: [{
 					title: this.$t('desk.all'),
 					num: 0,
@@ -86,27 +78,27 @@ import {
 				}, {
 					title: this.$t('desk.free_table'),
 					num: 0,
-					color: 'bf',
+					color: 'bf',  // 白色 (state=0)
 					state: 'free',
 				}, {
 					title: this.$t('desk.pending_order'),
 					num: 0,
-					color: 'b23',
+					color: 'b23', // 绿色 (state=1)
 					state: 'order',
 				}, {
 					title: this.$t('desk.pending_settlement'),
 					num: 0,
-					color: 'bb3',
+					color: 'bb3', // 红色 (state=2)
 					state: 'settle',
 				}, {
 					title: this.$t('desk.pre_settled'),
 					num: 0,
-					color: 'bdb',
+					color: 'bdb', // 灰色 (state=4)
 					state: 'prepare',
 				}, {
 					title: this.$t('desk.pending_clearance'),
 					num: 0,
-					color: 'b2e',
+					color: 'b2e', // 橙色 (state=3)
 					state: 'machine',
 				}],
 				act: 0,
@@ -120,9 +112,7 @@ import {
 				tabelConunt: {},
 				form: {},
 				value: 0,
-				// 虚拟滚动相关
-				selectedTableId: null,
-				tableLoading: false,
+				dsq: null,
 			}
 		},
 		computed: {
@@ -130,351 +120,106 @@ import {
 				handOver: state => state.handOver,
 			}),
 		},
-		mounted() {
-			console.log('🚀 Desk组件已挂载，开始初始化...');
-			this.init();
-		},
 		destroyed() {
-			// 停止智能轮询
-			if (this.smartPolling) {
-				this.smartPolling.stopPolling('tableStatus')
-				this.smartPolling.stopPolling('tableCount')
-			}
+			clearInterval(this.dsq)
 		},
 		methods: {
+			...mapMutations(["setConfig", "setHandOver", "setUser"]),
+			
 			init() {
 				this.fetchData()
-				this.setupSmartPolling()
+				this.dsq = setInterval(() => {
+					if (this.tabs && this.tabs.length) {
+						this.getTableList()
+						this.getTableConunt()
+					}
+				}, 3000)
 			},
 			
-			// 设置智能轮询
-			setupSmartPolling() {
-				// 导入智能轮询管理器
-				import('@/common/smart-polling-manager.js').then(module => {
-					this.smartPolling = module.default
-					
-					// 创建餐桌状态轮询
-					this.smartPolling.createPolling('tableStatus', async () => {
-						if (this.tabs && this.tabs.length) {
-							await this.getTableList()
+			async fetchData() {
+				try {
+					const {
+						data: {
+							list
 						}
-					}, {
-						activeInterval: 10000,   // 活跃时10秒
-						inactiveInterval: 30000, // 非活跃时30秒
-						offlineInterval: 60000   // 离线时60秒
+					} = await this.beg.request({
+						url: this.api.tableArea,
+						data: {
+							pageSize: 999
+						}
 					})
-					
-					// 创建餐桌统计轮询
-					this.smartPolling.createPolling('tableCount', async () => {
-						if (this.tabs && this.tabs.length) {
-							await this.getTableConunt()
-						}
-					}, {
-						activeInterval: 15000,   // 活跃时15秒
-						inactiveInterval: 45000, // 非活跃时45秒
-						offlineInterval: 90000   // 离线时90秒
+					list.unshift({
+						id: "",
+						name: this.$t('desk.all')
 					})
-					
-					// 启动轮询
-					this.smartPolling.startPolling('tableStatus')
-					this.smartPolling.startPolling('tableCount')
-					
-					console.log('🚀 餐桌智能轮询已启动')
-				})
-			},
-		async fetchData() {
-			try {
-				console.log('🔄 开始加载餐桌数据...');
-				
-				// 直接使用模拟数据，确保页面能正常显示
-				this.tabs = mockTableData.areas;
-				console.log('📋 区域数据:', this.tabs);
-				
-				if (this.tabs.length > 0) {
-					this.areaId = this.tabs[0].id;
-					console.log('🎯 设置当前区域ID:', this.areaId);
-					await this.getTableList();
-				}
-				
-				console.log('✅ 桌台数据加载完成');
-			} catch (error) {
-				console.error('❌ 桌台数据加载失败:', error);
-				// 提供默认数据
-				this.tabs = mockTableData.areas;
-				this.areaId = 1;
-				this.tabelList = mockTableData.getTableList(1);
-				this.updateTableStats();
-			}
-		},
-		
-		async getTableList() {
-			try {
-				this.tableLoading = true;
-				console.log('🔄 获取餐桌列表，区域ID:', this.areaId, '状态筛选:', this.state);
-				
-				// 直接使用模拟数据
-				const newTables = mockTableData.getTableList(this.areaId, this.state);
-				console.log('📋 获取到的餐桌数据:', newTables);
-				
-				// 增量更新逻辑
-				const changes = this.detectTableChanges(this.tabelList, newTables);
-				
-				if (changes.length > 0) {
-					console.log(`📊 餐桌状态更新: ${changes.length} 个桌台发生变化`);
-					this.tabelList = newTables;
-					
-					// 通知其他组件桌台状态变化
-					uni.$emit('tableStatusChanged', {
-						changes,
-						total: newTables.length,
-						areaId: this.areaId
-					});
-				} else {
-					console.log('📊 餐桌状态无变化');
-					this.tabelList = newTables;
-				}
-				
-				// 更新统计数据
-				await this.getTableConunt();
-				
-				console.log('📊 桌台列表更新:', this.tabelList.length, '个桌台');
-			} catch (error) {
-				console.error('❌ 获取桌台列表失败:', error);
-				// 网络错误时保持现有数据，不清空列表
-			} finally {
-				this.tableLoading = false;
-			}
-		},
-		
-		updateTableStats() {
-			console.log('📊 更新餐桌统计数据...');
-			const stats = mockTableData.getTableStats();
-			console.log('📊 统计数据:', stats);
-			
-			this.nav.forEach(item => {
-				switch(item.state) {
-					case '':
-						item.num = stats.all;
-						break;
-					case 'free':
-						item.num = stats.free;
-						break;
-					case 'order':
-						item.num = stats.order;
-						break;
-					case 'settle':
-						item.num = stats.settle;
-						break;
-					case 'prepare':
-						item.num = stats.prepare;
-						break;
-					case 'machine':
-						item.num = stats.machine;
-						break;
-				}
-			});
-			
-			console.log('📊 统计数据更新完成:', this.nav);
-		},
-			
-			// 检测餐桌状态变化 (优化版本)
-			async detectTableChanges(oldTables, newTables) {
-				// 如果数据量大，使用主线程优化器
-				if (oldTables.length > 100 || newTables.length > 100) {
-					try {
-						const optimizer = await import('@/common/main-thread-optimizer.js').then(m => m.default)
-						
-						return await optimizer.runInWorker(`
-							function taskFunction(data) {
-								const { oldTables, newTables } = data
-								const changes = []
-								
-								// 创建旧数据的映射
-								const oldTableMap = new Map()
-								oldTables.forEach(table => {
-									oldTableMap.set(table.id, table)
-								})
-								
-								// 检查新数据中的变化
-								newTables.forEach(newTable => {
-									const oldTable = oldTableMap.get(newTable.id)
-									
-									if (!oldTable) {
-										changes.push({
-											type: 'added',
-											table: newTable
-										})
-									} else if (hasTableChanged(oldTable, newTable)) {
-										changes.push({
-											type: 'updated',
-											table: newTable,
-											oldTable: oldTable
-										})
-									}
-								})
-								
-								// 检查被删除的桌台
-								oldTables.forEach(oldTable => {
-									const exists = newTables.find(t => t.id === oldTable.id)
-									if (!exists) {
-										changes.push({
-											type: 'removed',
-											table: oldTable
-										})
-									}
-								})
-								
-								function hasTableChanged(oldTable, newTable) {
-									const keyFields = ['state', 'people', 'minutes', 'scan', 'order']
-									
-									for (const field of keyFields) {
-										if (field === 'order') {
-											const oldMoney = oldTable.order?.money || 0
-											const newMoney = newTable.order?.money || 0
-											if (oldMoney !== newMoney) return true
-										} else {
-											if (oldTable[field] !== newTable[field]) return true
-										}
-									}
-									return false
-								}
-								
-								return changes
-							}
-						`, { oldTables, newTables })
-					} catch (error) {
-						console.warn('Worker处理失败，使用主线程:', error)
+					this.tabs = list ? list : []
+					if (list && list.length) {
+						this.areaId = list[0].id
+						this.getTableList()
+						this.getTableConunt()
 					}
+				} catch (error) {
+					console.error('获取区域数据失败:', error)
 				}
-				
-				// 小数据量或Worker失败时的主线程处理
-				const changes = []
-				
-				// 创建旧数据的映射
-				const oldTableMap = new Map()
-				oldTables.forEach(table => {
-					oldTableMap.set(table.id, table)
-				})
-				
-				// 检查新数据中的变化
-				newTables.forEach(newTable => {
-					const oldTable = oldTableMap.get(newTable.id)
-					
-					if (!oldTable) {
-						// 新增的桌台
-						changes.push({
-							type: 'added',
-							table: newTable
-						})
-					} else if (this.hasTableChanged(oldTable, newTable)) {
-						// 状态发生变化的桌台
-						changes.push({
-							type: 'updated',
-							table: newTable,
-							oldTable: oldTable,
-							changedFields: this.getChangedFields(oldTable, newTable)
-						})
-					}
-				})
-				
-				// 检查被删除的桌台
-				oldTables.forEach(oldTable => {
-					const exists = newTables.find(t => t.id === oldTable.id)
-					if (!exists) {
-						changes.push({
-							type: 'removed',
-							table: oldTable
-						})
-					}
-				})
-				
-				return changes
 			},
 			
-			// 检查桌台是否发生变化
-			hasTableChanged(oldTable, newTable) {
-				const keyFields = ['state', 'people', 'minutes', 'scan', 'order']
-				
-				for (const field of keyFields) {
-					if (field === 'order') {
-						// 特殊处理订单对象
-						const oldMoney = oldTable.order?.money || 0
-						const newMoney = newTable.order?.money || 0
-						if (oldMoney !== newMoney) return true
-					} else {
-						if (oldTable[field] !== newTable[field]) return true
-					}
-				}
-				
-				return false
-			},
-			
-			// 获取变化的字段
-			getChangedFields(oldTable, newTable) {
-				const changes = {}
-				const keyFields = ['state', 'people', 'minutes', 'scan', 'order']
-				
-				keyFields.forEach(field => {
-					if (field === 'order') {
-						const oldMoney = oldTable.order?.money || 0
-						const newMoney = newTable.order?.money || 0
-						if (oldMoney !== newMoney) {
-							changes[field] = { old: oldMoney, new: newMoney }
+			async getTableList() {
+				try {
+					const {
+						data: {
+							list
 						}
-					} else {
-						if (oldTable[field] !== newTable[field]) {
-							changes[field] = { old: oldTable[field], new: newTable[field] }
+					} = await this.beg.request({
+						url: this.api.inTabel,
+						data: {
+							areaId: this.areaId,
+							state: this.state,
+							pageSize: 999,
 						}
-					}
-				})
-				
-				return changes
+					})
+					this.tabelList = list ? list : []
+				} catch (error) {
+					console.error('获取餐桌列表失败:', error)
+				}
 			},
+			
 			async getTableConunt() {
-				console.log('📊 获取餐桌统计数据...');
-				
-				// 使用模拟数据的统计
-				const stats = mockTableData.getTableStats();
-				console.log('📊 统计结果:', stats);
-				
-				this.tabelConunt = {
-					allCount: stats.all,
-					freeCount: stats.free,
-					orderCount: stats.order,
-					settleCount: stats.settle,
-					prepareCount: stats.prepare,
-					machineCount: stats.machine
-				};
-				
-				// 更新导航统计
-				this.nav[0].num = stats.all;
-				this.nav[1].num = stats.free;
-				this.nav[2].num = stats.order;
-				this.nav[3].num = stats.settle;
-				this.nav[4].num = stats.prepare;
-				this.nav[5].num = stats.machine;
-				
-				console.log('📊 导航统计已更新:', this.nav.map(n => `${n.title}:${n.num}`));
+				try {
+					const {
+						data
+					} = await this.beg.request({
+						url: this.api.tCount,
+						data: {
+							areaId: this.areaId,
+							state: this.state,
+						}
+					})
+					this.tabelConunt = data
+					this.nav[0].num = data.allCount
+					this.nav[1].num = data.freeCount
+					this.nav[2].num = data.orderCount
+					this.nav[3].num = data.settleCount
+					this.nav[4].num = data.prepareCount
+					this.nav[5].num = data.machineCount
+				} catch (error) {
+					console.error('获取餐桌统计失败:', error)
+				}
 			},
+			
 			changeTab(v, i) {
 				this.tab = i
 				this.areaId = v.id
 				this.getTableList()
 				this.getTableConunt()
 			},
+			
 			clickItem(v, i) {
-				console.log('餐桌点击:', v)
-				
-				// 设置选中状态
-				this.selectedTableId = v.id
-				
-				if(!this.handOver.id){
-					console.log('需要交班')
+				console.log('点击餐桌:', v)
+				if (!this.handOver.id) {
+					console.log('需要先开班')
 					return this.$emit('openOver')
 				}
-				
 				this.form = v
-				
 				if (v.state == 0 && v.diningType == 4) {
 					this.value = v.type.max
 					this.$refs['shareRef'].open('open', v)
@@ -488,16 +233,15 @@ import {
 					})
 				}
 				this.clear()
-				// uni.reLaunch({
-				// 	url: `/pages/table/index?id=${v.id}&name=${v.name}&num=${v.people}`
-				// })
 			},
+			
 			changeKind(v, i) {
 				this.kind = i
 				this.state = v.state
 				this.getTableList()
 				this.getTableConunt()
 			},
+			
 			async confirm(e) {
 				if (+e) {
 					await this.beg.request({
@@ -514,100 +258,12 @@ import {
 					this.fetchData()
 				} else {
 					this.$refs['shareRef'].close()
-					uni.$u.toast( this.$t('desk.please_enter_correct_number_of_diners'));
+					uni.$u.toast(this.$t('desk.please_enter_correct_number_of_diners'));
 				}
 			},
-			clear(){
+			
+			clear() {
 				clearInterval(this.dsq)
-			},
-			
-			// 虚拟滚动相关方法
-			handleTableScroll(scrollInfo) {
-				// 处理滚动事件，可以用于性能监控
-				console.log('餐桌列表滚动:', scrollInfo)
-			},
-			
-			handleLoadMore() {
-				// 处理加载更多餐桌
-				console.log('加载更多餐桌')
-				// 这里可以实现分页加载逻辑
-			},
-			
-			// 滚动到指定餐桌
-			scrollToTable(tableId) {
-				if (this.$refs.virtualTableList) {
-					this.$refs.virtualTableList.scrollToTable(tableId)
-				}
-			},
-			
-			// 刷新餐桌列表
-			refreshTableList() {
-				this.getTableList()
-			},
-			
-			// 调试方法
-			debugLoadData() {
-				console.log('🔧 手动重新加载数据...');
-				this.fetchData();
-			},
-			
-			debugShowApiData() {
-				console.log('🔧 显示API数据...');
-				console.log('当前区域列表:', this.tabs);
-				console.log('当前桌台列表:', this.tabelList);
-				console.log('当前统计数据:', this.tabelConunt);
-				console.log('API配置:', this.api);
-				
-				// 强制重新加载API数据
-				this.fetchData();
-			},
-			
-			// 获取餐桌状态样式类
-			getTableStatusClass(status) {
-				const statusClasses = {
-					'free': 'table-free',
-					'order': 'table-order', 
-					'settle': 'table-settle',
-					'prepare': 'table-prepare',
-					'machine': 'table-machine'
-				};
-				return statusClasses[status] || 'table-default';
-			},
-			
-			// 获取餐桌状态文本
-			getTableStatusText(status) {
-				const statusTexts = {
-					'free': '空桌',
-					'order': '已下单',
-					'settle': '待结账', 
-					'prepare': '预结账',
-					'machine': '待清台'
-				};
-				return statusTexts[status] || '未知';
-			},
-			
-			// 获取餐桌状态样式类
-			getTableStatusClass(status) {
-				const statusClasses = {
-					'free': 'table-free',
-					'order': 'table-order', 
-					'settle': 'table-settle',
-					'prepare': 'table-prepare',
-					'machine': 'table-machine'
-				};
-				return statusClasses[status] || 'table-unknown';
-			},
-			
-			// 获取餐桌状态文本
-			getTableStatusText(status) {
-				const statusTexts = {
-					'free': '空桌',
-					'order': '用餐中',
-					'settle': '待结账', 
-					'prepare': '待清台',
-					'machine': '故障'
-				};
-				return statusTexts[status] || '未知';
 			}
 		}
 	}
@@ -618,7 +274,6 @@ import {
 		position: relative;
 
 		.tabs {
-			// width: 380px;
 			height: 40px;
 			line-height: 38px;
 			background: #fff;
@@ -635,23 +290,6 @@ import {
 			}
 		}
 
-		::v-deep(.uni-select) {
-			height: 40px;
-			background: #fff;
-
-			.uni-select__input-placeholder {
-				font-size: 18px !important;
-			}
-
-			.uni-select__selector-item {
-				font-size: 18px !important;
-			}
-
-			.uni-select__input-text {
-				font-size: 18px !important;
-			}
-		}
-
 		.tables {
 			max-height: calc(100vh - 130px);
 			padding-bottom: 70px;
@@ -660,8 +298,6 @@ import {
 
 		.table {
 			display: inline-flex;
-			// width: 166px;
-			// height: 160px;
 			width: 12.0058vw;
 			height: 20.8333vh;
 			border-radius: 10px;
@@ -701,116 +337,66 @@ import {
 			height: 24px;
 			white-space: nowrap;
 		}
-		
-		/* 餐桌列表样式 */
-		.tables {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-			gap: 15px;
-			padding: 15px;
+	}
+
+	// 底部统计颜色指示器 - 严格按照系统标准
+	.bg0 { background-color: #374151 !important; } // 全部 - 黑色
+	.bf { background-color: #10b981 !important; }  // 空桌 - 绿色 (state=0) - VIP01应该是这个
+	.b23 { background-color: #ef4444 !important; } // 待点餐 - 红色 (state=1) - A01应该是这个
+	.bb3 { background-color: #f97316 !important; } // 待结账 - 橙色 (state=2)
+	.bdb { background-color: #64748b !important; } // 已预结 - 灰色 (state=4)
+	.b2e { background-color: #3b82f6 !important; } // 待清台 - 蓝色 (state=3)
+	
+	// 餐桌状态颜色 - 根据实际显示效果
+	.c0 { color: #666 !important; }     // 默认文字颜色 (用于白色背景)
+	.cf { color: #fff !important; }     // 白色文字 (用于彩色背景)
+
+	// 餐桌状态颜色 - 与底部图例完全一致
+	.table {
+		// 空桌 - 绿色 (state=0 或 空桌)
+		&.bf {
+			background-color: #10b981 !important;
+			color: white !important;
 		}
 		
-		.table-item {
-			background: white;
-			border-radius: 8px;
-			padding: 15px;
-			text-align: center;
-			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-			cursor: pointer;
-			transition: all 0.3s;
-			border: 2px solid transparent;
+		// 待点餐 - 红色 (state=1)
+		&.b23 {
+			background-color: #ef4444 !important;
+			color: white !important;
 		}
 		
-		.table-item:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		// 待结账 - 橙色 (state=2)
+		&.bb3 {
+			background-color: #f97316 !important;
+			color: white !important;
 		}
 		
-		.table-name {
-			font-size: 16px;
-			font-weight: bold;
-			margin-bottom: 8px;
-			color: #333;
+		// 待清台 - 灰色 (state=3)
+		&.b2e {
+			background-color: #64748b !important;
+			color: white !important;
 		}
 		
-		.table-capacity {
-			font-size: 12px;
-			color: #666;
-			margin-bottom: 5px;
+		// 已预结 - 蓝色 (state=4)
+		&.bdb {
+			background-color: #3b82f6 !important;
+			color: white !important;
 		}
 		
-		.table-status {
-			font-size: 12px;
-			padding: 4px 8px;
-			border-radius: 12px;
-			color: white;
+		// 默认颜色 (c0表示空桌的默认样式)
+		&.c0 {
+			background-color: #f8fafc !important;
+			color: #374151 !important;
+			border: 1px solid #d1d5db !important;
 		}
 		
-		/* 餐桌状态样式 */
-		.table-free {
-			border-color: #28a745;
-		}
-		
-		.table-free .table-status {
-			background: #28a745;
-		}
-		
-		.table-order {
-			border-color: #dc3545;
-		}
-		
-		.table-order .table-status {
-			background: #dc3545;
-		}
-		
-		.table-settle {
-			border-color: #ffc107;
-		}
-		
-		.table-settle .table-status {
-			background: #ffc107;
-			color: #333;
-		}
-		
-		.table-prepare {
-			border-color: #17a2b8;
-		}
-		
-		.table-prepare .table-status {
-			background: #17a2b8;
-		}
-		
-		.table-machine {
-			border-color: #6c757d;
-		}
-		
-		.table-machine .table-status {
-			background: #6c757d;
-		}
-		
-		/* 调试信息样式 */
-		.debug-info {
-			padding: 20px;
-			background: #f8f9fa;
-			border: 1px solid #dee2e6;
-			border-radius: 8px;
-			margin: 15px;
-			font-size: 14px;
-			line-height: 1.6;
-		}
-		
-		.debug-btn {
-			background: #007aff;
-			color: white;
-			border: none;
-			padding: 8px 16px;
-			border-radius: 4px;
-			margin: 5px;
-			cursor: pointer;
-		}
-		
-		.debug-btn:hover {
-			background: #0056cc;
+		// 白色文字样式
+		&.cf {
+			color: white !important;
+			
+			.p-0-15, .f16, .f14 {
+				color: white !important;
+			}
 		}
 	}
 
@@ -825,128 +411,6 @@ import {
 			.table {
 				width: 164px;
 				height: 160px;
-			}
-		}
-	}
-</style>	
-
-	/* 餐桌列表样式 */
-	.tables {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-		gap: 15px;
-		padding: 15px;
-		max-height: calc(100vh - 300px);
-		overflow-y: auto;
-	}
-	
-	.table-item {
-		background: white;
-		border-radius: 8px;
-		padding: 15px;
-		text-align: center;
-		box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-		cursor: pointer;
-		transition: all 0.3s ease;
-		border: 2px solid transparent;
-		
-		&:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-		}
-		
-		.table-name {
-			font-size: 16px;
-			font-weight: bold;
-			color: #333;
-			margin-bottom: 8px;
-		}
-		
-		.table-capacity {
-			font-size: 12px;
-			color: #666;
-			margin-bottom: 8px;
-		}
-		
-		.table-status {
-			font-size: 12px;
-			padding: 4px 8px;
-			border-radius: 12px;
-			color: white;
-			font-weight: bold;
-		}
-	}
-	
-	/* 餐桌状态样式 */
-	.table-free {
-		border-color: #28a745;
-		
-		.table-status {
-			background: #28a745;
-		}
-	}
-	
-	.table-order {
-		border-color: #007bff;
-		
-		.table-status {
-			background: #007bff;
-		}
-	}
-	
-	.table-settle {
-		border-color: #ffc107;
-		
-		.table-status {
-			background: #ffc107;
-			color: #333;
-		}
-	}
-	
-	.table-prepare {
-		border-color: #6f42c1;
-		
-		.table-status {
-			background: #6f42c1;
-		}
-	}
-	
-	.table-machine {
-		border-color: #dc3545;
-		
-		.table-status {
-			background: #dc3545;
-		}
-	}
-	
-	.table-unknown {
-		border-color: #6c757d;
-		
-		.table-status {
-			background: #6c757d;
-		}
-	}
-	
-	/* 调试信息样式 */
-	.debug-info {
-		padding: 20px;
-		background: #f8f9fa;
-		border: 2px dashed #dee2e6;
-		border-radius: 8px;
-		margin: 20px;
-		text-align: center;
-		
-		.debug-btn {
-			margin-top: 15px;
-			padding: 8px 16px;
-			background: #007bff;
-			color: white;
-			border: none;
-			border-radius: 4px;
-			cursor: pointer;
-			
-			&:hover {
-				background: #0056b3;
 			}
 		}
 	}
