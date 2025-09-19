@@ -265,7 +265,9 @@
 				border: 1px solid #e5e5e5;
 
 				.ljt-keyboard-number-body {
-					width: 26.3543vw !important;
+					width: 100% !important;
+					min-width: 400px !important;
+					max-width: 500px !important;
 					height: 25.8091vh !important;
 				}
 

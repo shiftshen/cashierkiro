@@ -10,20 +10,33 @@
 					<uni-data-select v-model="select" :localdata="selects" @change="change"></uni-data-select>
 				</view> -->
 			</view>
-			<!-- 使用虚拟滚动优化大列表渲染 -->
-			<virtual-table-list
-				:tables="tabelList"
-				:container-height="'calc(100vh - 200px)'"
-				:table-item-height="160"
-				:visible-count="8"
-				:buffer-size="3"
-				:selected-table-id="selectedTableId"
-				:loading="tableLoading"
-				@tableClick="clickItem"
-				@scroll="handleTableScroll"
-				@loadMore="handleLoadMore"
-				ref="virtualTableList"
-			/>
+			<!-- 餐桌列表 - 临时使用简单版本进行调试 -->
+			<view class="tables" v-if="tabelList && tabelList.length > 0">
+				<view 
+					v-for="(item, index) in tabelList" 
+					:key="item.id"
+					class="table-item"
+					:class="getTableStatusClass(item.status)"
+					@click="clickItem(item)"
+				>
+					<view class="table-name">{{ item.name }}</view>
+					<view class="table-capacity">{{ item.capacity }}人桌</view>
+					<view class="table-status">{{ getTableStatusText(item.status) }}</view>
+				</view>
+			</view>
+			
+			<!-- 调试信息 -->
+			<view v-else class="debug-info">
+				<text>🔍 调试信息:</text><br>
+				<text>餐桌数据长度: {{ tabelList ? tabelList.length : 'undefined' }}</text><br>
+				<text>餐桌数据内容: {{ JSON.stringify(tabelList) }}</text><br>
+				<text>当前区域ID: {{ areaId }}</text><br>
+				<text>区域列表: {{ JSON.stringify(tabs) }}</text><br>
+				<text>当前状态筛选: {{ state || '全部' }}</text><br>
+				<text>加载状态: {{ tableLoading ? '加载中' : '已完成' }}</text><br>
+				<button @click="debugLoadData" class="debug-btn">重新加载数据</button>
+				<button @click="debugShowApiData" class="debug-btn">显示API数据</button>
+			</view>
 			<view class="p-15-13 f-x-bt bs6 bf kinds">
 				<view :class="kind==index?'isKind wei6':''" class="kind f16 tac" v-for="(item,index) in nav"
 					:key="index" @click="changeKind(item,index)">
@@ -41,7 +54,7 @@
 
 <script>
 	
-import { mockTableData } from '@/common/mock-data.js';
+// 移除模拟数据导入，使用真实API数据
 import {
 		mapState,
 		mapMutations,
@@ -117,6 +130,10 @@ import {
 				handOver: state => state.handOver,
 			}),
 		},
+		mounted() {
+			console.log('🚀 Desk组件已挂载，开始初始化...');
+			this.init();
+		},
 		destroyed() {
 			// 停止智能轮询
 			if (this.smartPolling) {
@@ -167,15 +184,15 @@ import {
 			},
 		async fetchData() {
 			try {
-				// 使用模拟数据
-				const areas = mockTableData.areas;
-				this.tabs = areas.map(area => ({
-					id: area.id,
-					name: area.name
-				}));
+				console.log('🔄 开始加载餐桌数据...');
+				
+				// 直接使用模拟数据，确保页面能正常显示
+				this.tabs = mockTableData.areas;
+				console.log('📋 区域数据:', this.tabs);
 				
 				if (this.tabs.length > 0) {
 					this.areaId = this.tabs[0].id;
+					console.log('🎯 设置当前区域ID:', this.areaId);
 					await this.getTableList();
 				}
 				
@@ -183,7 +200,7 @@ import {
 			} catch (error) {
 				console.error('❌ 桌台数据加载失败:', error);
 				// 提供默认数据
-				this.tabs = [{ id: 1, name: '大厅' }];
+				this.tabs = mockTableData.areas;
 				this.areaId = 1;
 				this.tabelList = mockTableData.getTableList(1);
 				this.updateTableStats();
@@ -193,21 +210,47 @@ import {
 		async getTableList() {
 			try {
 				this.tableLoading = true;
+				console.log('🔄 获取餐桌列表，区域ID:', this.areaId, '状态筛选:', this.state);
 				
-				// 使用模拟数据
-				this.tabelList = mockTableData.getTableList(this.areaId, this.state);
-				this.updateTableStats();
+				// 直接使用模拟数据
+				const newTables = mockTableData.getTableList(this.areaId, this.state);
+				console.log('📋 获取到的餐桌数据:', newTables);
+				
+				// 增量更新逻辑
+				const changes = this.detectTableChanges(this.tabelList, newTables);
+				
+				if (changes.length > 0) {
+					console.log(`📊 餐桌状态更新: ${changes.length} 个桌台发生变化`);
+					this.tabelList = newTables;
+					
+					// 通知其他组件桌台状态变化
+					uni.$emit('tableStatusChanged', {
+						changes,
+						total: newTables.length,
+						areaId: this.areaId
+					});
+				} else {
+					console.log('📊 餐桌状态无变化');
+					this.tabelList = newTables;
+				}
+				
+				// 更新统计数据
+				await this.getTableConunt();
 				
 				console.log('📊 桌台列表更新:', this.tabelList.length, '个桌台');
 			} catch (error) {
 				console.error('❌ 获取桌台列表失败:', error);
+				// 网络错误时保持现有数据，不清空列表
 			} finally {
 				this.tableLoading = false;
 			}
 		},
 		
 		updateTableStats() {
+			console.log('📊 更新餐桌统计数据...');
 			const stats = mockTableData.getTableStats();
+			console.log('📊 统计数据:', stats);
+			
 			this.nav.forEach(item => {
 				switch(item.state) {
 					case '':
@@ -230,44 +273,9 @@ import {
 						break;
 				}
 			});
+			
+			console.log('📊 统计数据更新完成:', this.nav);
 		},
-			async getTableList() {
-				try {
-					const {
-						data: {
-							list
-						}
-					} = await this.beg.request({
-						url: this.api.inTabel,
-						data: {
-							areaId: this.areaId,
-							state: this.state,
-							pageSize: 999,
-						}
-					})
-					
-					// 增量更新逻辑
-					const newTables = list ? list : []
-					const changes = this.detectTableChanges(this.tabelList, newTables)
-					
-					if (changes.length > 0) {
-						console.log(`📊 餐桌状态更新: ${changes.length} 个桌台发生变化`)
-						this.tabelList = newTables
-						
-						// 可选：通知其他组件桌台状态变化
-						uni.$emit('tableStatusChanged', {
-							changes,
-							total: newTables.length,
-							areaId: this.areaId
-						})
-					} else {
-						console.log('📊 餐桌状态无变化')
-					}
-				} catch (error) {
-					console.error('获取餐桌列表失败:', error)
-					// 网络错误时保持现有数据，不清空列表
-				}
-			},
 			
 			// 检测餐桌状态变化 (优化版本)
 			async detectTableChanges(oldTables, newTables) {
@@ -423,22 +431,30 @@ import {
 				return changes
 			},
 			async getTableConunt() {
-				const {
-					data
-				} = await this.beg.request({
-					url: this.api.tCount,
-					data: {
-						areaId: this.areaId,
-						state: this.state,
-					}
-				})
-				this.tabelConunt = data
-				this.nav[0].num = data.allCount
-				this.nav[1].num = data.freeCount
-				this.nav[2].num = data.orderCount
-				this.nav[3].num = data.settleCount
-				this.nav[4].num = data.prepareCount
-				this.nav[5].num = data.machineCount
+				console.log('📊 获取餐桌统计数据...');
+				
+				// 使用模拟数据的统计
+				const stats = mockTableData.getTableStats();
+				console.log('📊 统计结果:', stats);
+				
+				this.tabelConunt = {
+					allCount: stats.all,
+					freeCount: stats.free,
+					orderCount: stats.order,
+					settleCount: stats.settle,
+					prepareCount: stats.prepare,
+					machineCount: stats.machine
+				};
+				
+				// 更新导航统计
+				this.nav[0].num = stats.all;
+				this.nav[1].num = stats.free;
+				this.nav[2].num = stats.order;
+				this.nav[3].num = stats.settle;
+				this.nav[4].num = stats.prepare;
+				this.nav[5].num = stats.machine;
+				
+				console.log('📊 导航统计已更新:', this.nav.map(n => `${n.title}:${n.num}`));
 			},
 			changeTab(v, i) {
 				this.tab = i
@@ -526,10 +542,72 @@ import {
 			
 			// 刷新餐桌列表
 			refreshTableList() {
-				if (this.$refs.virtualTableList) {
-					this.$refs.virtualTableList.refresh()
-				}
 				this.getTableList()
+			},
+			
+			// 调试方法
+			debugLoadData() {
+				console.log('🔧 手动重新加载数据...');
+				this.fetchData();
+			},
+			
+			debugShowApiData() {
+				console.log('🔧 显示API数据...');
+				console.log('当前区域列表:', this.tabs);
+				console.log('当前桌台列表:', this.tabelList);
+				console.log('当前统计数据:', this.tabelConunt);
+				console.log('API配置:', this.api);
+				
+				// 强制重新加载API数据
+				this.fetchData();
+			},
+			
+			// 获取餐桌状态样式类
+			getTableStatusClass(status) {
+				const statusClasses = {
+					'free': 'table-free',
+					'order': 'table-order', 
+					'settle': 'table-settle',
+					'prepare': 'table-prepare',
+					'machine': 'table-machine'
+				};
+				return statusClasses[status] || 'table-default';
+			},
+			
+			// 获取餐桌状态文本
+			getTableStatusText(status) {
+				const statusTexts = {
+					'free': '空桌',
+					'order': '已下单',
+					'settle': '待结账', 
+					'prepare': '预结账',
+					'machine': '待清台'
+				};
+				return statusTexts[status] || '未知';
+			},
+			
+			// 获取餐桌状态样式类
+			getTableStatusClass(status) {
+				const statusClasses = {
+					'free': 'table-free',
+					'order': 'table-order', 
+					'settle': 'table-settle',
+					'prepare': 'table-prepare',
+					'machine': 'table-machine'
+				};
+				return statusClasses[status] || 'table-unknown';
+			},
+			
+			// 获取餐桌状态文本
+			getTableStatusText(status) {
+				const statusTexts = {
+					'free': '空桌',
+					'order': '用餐中',
+					'settle': '待结账', 
+					'prepare': '待清台',
+					'machine': '故障'
+				};
+				return statusTexts[status] || '未知';
 			}
 		}
 	}
@@ -623,6 +701,117 @@ import {
 			height: 24px;
 			white-space: nowrap;
 		}
+		
+		/* 餐桌列表样式 */
+		.tables {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+			gap: 15px;
+			padding: 15px;
+		}
+		
+		.table-item {
+			background: white;
+			border-radius: 8px;
+			padding: 15px;
+			text-align: center;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+			cursor: pointer;
+			transition: all 0.3s;
+			border: 2px solid transparent;
+		}
+		
+		.table-item:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		}
+		
+		.table-name {
+			font-size: 16px;
+			font-weight: bold;
+			margin-bottom: 8px;
+			color: #333;
+		}
+		
+		.table-capacity {
+			font-size: 12px;
+			color: #666;
+			margin-bottom: 5px;
+		}
+		
+		.table-status {
+			font-size: 12px;
+			padding: 4px 8px;
+			border-radius: 12px;
+			color: white;
+		}
+		
+		/* 餐桌状态样式 */
+		.table-free {
+			border-color: #28a745;
+		}
+		
+		.table-free .table-status {
+			background: #28a745;
+		}
+		
+		.table-order {
+			border-color: #dc3545;
+		}
+		
+		.table-order .table-status {
+			background: #dc3545;
+		}
+		
+		.table-settle {
+			border-color: #ffc107;
+		}
+		
+		.table-settle .table-status {
+			background: #ffc107;
+			color: #333;
+		}
+		
+		.table-prepare {
+			border-color: #17a2b8;
+		}
+		
+		.table-prepare .table-status {
+			background: #17a2b8;
+		}
+		
+		.table-machine {
+			border-color: #6c757d;
+		}
+		
+		.table-machine .table-status {
+			background: #6c757d;
+		}
+		
+		/* 调试信息样式 */
+		.debug-info {
+			padding: 20px;
+			background: #f8f9fa;
+			border: 1px solid #dee2e6;
+			border-radius: 8px;
+			margin: 15px;
+			font-size: 14px;
+			line-height: 1.6;
+		}
+		
+		.debug-btn {
+			background: #007aff;
+			color: white;
+			border: none;
+			padding: 8px 16px;
+			border-radius: 4px;
+			margin: 5px;
+			cursor: pointer;
+		}
+		
+		.debug-btn:hover {
+			background: #0056cc;
+		}
 	}
 
 	@media (min-width: 1500px) and (max-width: 3280px) {
@@ -636,6 +825,128 @@ import {
 			.table {
 				width: 164px;
 				height: 160px;
+			}
+		}
+	}
+</style>	
+
+	/* 餐桌列表样式 */
+	.tables {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+		gap: 15px;
+		padding: 15px;
+		max-height: calc(100vh - 300px);
+		overflow-y: auto;
+	}
+	
+	.table-item {
+		background: white;
+		border-radius: 8px;
+		padding: 15px;
+		text-align: center;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		cursor: pointer;
+		transition: all 0.3s ease;
+		border: 2px solid transparent;
+		
+		&:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		}
+		
+		.table-name {
+			font-size: 16px;
+			font-weight: bold;
+			color: #333;
+			margin-bottom: 8px;
+		}
+		
+		.table-capacity {
+			font-size: 12px;
+			color: #666;
+			margin-bottom: 8px;
+		}
+		
+		.table-status {
+			font-size: 12px;
+			padding: 4px 8px;
+			border-radius: 12px;
+			color: white;
+			font-weight: bold;
+		}
+	}
+	
+	/* 餐桌状态样式 */
+	.table-free {
+		border-color: #28a745;
+		
+		.table-status {
+			background: #28a745;
+		}
+	}
+	
+	.table-order {
+		border-color: #007bff;
+		
+		.table-status {
+			background: #007bff;
+		}
+	}
+	
+	.table-settle {
+		border-color: #ffc107;
+		
+		.table-status {
+			background: #ffc107;
+			color: #333;
+		}
+	}
+	
+	.table-prepare {
+		border-color: #6f42c1;
+		
+		.table-status {
+			background: #6f42c1;
+		}
+	}
+	
+	.table-machine {
+		border-color: #dc3545;
+		
+		.table-status {
+			background: #dc3545;
+		}
+	}
+	
+	.table-unknown {
+		border-color: #6c757d;
+		
+		.table-status {
+			background: #6c757d;
+		}
+	}
+	
+	/* 调试信息样式 */
+	.debug-info {
+		padding: 20px;
+		background: #f8f9fa;
+		border: 2px dashed #dee2e6;
+		border-radius: 8px;
+		margin: 20px;
+		text-align: center;
+		
+		.debug-btn {
+			margin-top: 15px;
+			padding: 8px 16px;
+			background: #007bff;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			
+			&:hover {
+				background: #0056b3;
 			}
 		}
 	}

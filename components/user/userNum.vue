@@ -108,8 +108,8 @@
 
 <style lang="scss" scoped>
 	.cash {
-		width: 450px;
-		// height: 416px;
+		width: 520px;
+		min-width: 520px;
 
 		::v-deep(.u-input) {
 			padding: 9px !important;
@@ -119,16 +119,27 @@
 			border: 1px solid #e5e5e5;
 
 			.ljt-keyboard-number-body {
-				width: 450px !important;
-				height: 275px !important;
+				width: 520px !important;
+				min-width: 520px !important;
+				height: 300px !important;
 			}
 
-			.ljt-number-btn-ac {
-				// width: 100px !important;
+			.ljt-number-btn {
+				min-height: 60px !important;
+				display: flex !important;
+				align-items: center !important;
+				justify-content: center !important;
+				padding: 8px !important;
+				box-sizing: border-box !important;
+			}
+
+			.ljt-number-text {
+				font-size: 24px !important;
+				font-weight: bold !important;
+				line-height: 1 !important;
 			}
 
 			.ljt-number-btn-confirm-2 {
-				// width: 100px !important;
 				background: #4275F4 !important;
 			}
 		}
@@ -144,9 +155,14 @@
 	}
 	@media (min-width: 500px) and (max-width: 900px) {
 		.cash { 
+			width: 520px;
+			min-width: 520px;
+			
 			::v-deep(.ljt-keyboard-body) {
 				.ljt-keyboard-number-body {
-					height: 150px !important;
+					width: 520px !important;
+					min-width: 520px !important;
+					height: 300px !important;
 				}
 			}
 		}

@@ -2,7 +2,7 @@
 	<view :ref="mRef" class="flex ljt-keyboard-body">
 		<slot></slot>
 		<view class="flex ljt-keyboard-number-body"
-			:style="{width:windowWidth+'px',backgroundColor:bodyBackground,padding:padding,height:keyboardHeight+'rpx'}">
+			:style="{width:'100%',minWidth:windowWidth+'px',backgroundColor:bodyBackground,padding:padding,height:keyboardHeight+'rpx'}">
 			<view class="" style="flex:3;">
 				<view class="flex ljt-number-row" :style="{height:height+'rpx'}"
 					:class="[(rowIndex==0||theme=='button')?'':'ljt-top-border']"
@@ -237,8 +237,10 @@
 		created() {
 			this.mValue = this.value
 			this.sysInfo = uni.getSystemInfoSync()
-			this.windowWidth = this.sysInfo.windowWidth
-			this.cellWidth = (this.sysInfo.windowWidth / 4) - 4
+			// 彻底修复键盘宽度问题 - 使用固定宽度确保所有按钮都能显示
+			// 设置固定宽度，确保3列数字按钮 + 1列功能按钮都能完整显示
+			this.windowWidth = 520 // 固定宽度520px，确保4列按钮都能完整显示
+			this.cellWidth = 130 // 每个按钮130px宽度
 			this.mMax = Number(this.max)
 			this.mMin = Number(this.min)
 
@@ -267,6 +269,10 @@
 				this.themeCellClass = 'ljt-button-theme-cell'
 				this.height = 100
 				this.padding = '10rpx'
+			} else {
+				// 默认主题，调整按钮高度确保显示完整
+				this.height = 70 // 增加按钮高度
+				this.padding = '5rpx' // 减少内边距
 			}
 			this.keyboardHeight = this.height * 4
 
@@ -553,8 +559,9 @@
 	}
 
 	.ljt-number-text {
-		font-size: 36rpx;
+		font-size: 24px;
 		color: rgba(0, 0, 0, .85);
+		font-weight: bold;
 	}
 
 	.ljt-number-btn-ac:active {

@@ -108,7 +108,9 @@
 
 <style lang="scss" scoped>
 	.cash {
-		width: 450px;
+		width: 100%;
+		min-width: 480px;
+		max-width: 600px;
 		// height: 416px;
 
 		::v-deep(.u-input) {
@@ -119,7 +121,9 @@
 			border: 1px solid #e5e5e5;
 
 			.ljt-keyboard-number-body {
-				width: 450px !important;
+				width: 100% !important;
+				min-width: 480px !important;
+				max-width: 600px !important;
 				height: 275px !important;
 			}
 

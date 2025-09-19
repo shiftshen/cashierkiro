@@ -202,7 +202,9 @@
 			border: 1px solid #e5e5e5;
 
 			.ljt-keyboard-number-body {
-				width: 550px !important;
+				width: 100% !important;
+				min-width: 480px !important;
+				max-width: 600px !important;
 				height: 275px !important;
 			}
 
