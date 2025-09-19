@@ -40,7 +40,9 @@
 </template>
 
 <script>
-	import {
+	
+import { mockTableData } from '@/common/mock-data.js';
+import {
 		mapState,
 		mapMutations,
 	} from 'vuex'
@@ -163,28 +165,73 @@
 					console.log('🚀 餐桌智能轮询已启动')
 				})
 			},
-			async fetchData() {
-				const {
-					data: {
-						list
-					}
-				} = await this.beg.request({
-					url: this.api.tableArea,
-					data: {
-						pageSize: 999
-					}
-				})
-				list.unshift({
-					id: "",
-					name: this.$t('desk.all')
-				})
-				this.tabs = list ? list : []
-				if (list && list.length) {
-					this.areaId = list[0].id
-					this.getTableList()
-					this.getTableConunt()
+			async 
+		async fetchData() {
+			try {
+				// 使用模拟数据
+				const areas = mockTableData.areas;
+				this.tabs = areas.map(area => ({
+					id: area.id,
+					name: area.name
+				}));
+				
+				if (this.tabs.length > 0) {
+					this.areaId = this.tabs[0].id;
+					await this.getTableList();
 				}
-			},
+				
+				console.log('✅ 桌台数据加载完成');
+			} catch (error) {
+				console.error('❌ 桌台数据加载失败:', error);
+				// 提供默认数据
+				this.tabs = [{ id: 1, name: '大厅' }];
+				this.areaId = 1;
+				this.tabelList = mockTableData.getTableList(1);
+				this.updateTableStats();
+			}
+		},
+		
+		async getTableList() {
+			try {
+				this.tableLoading = true;
+				
+				// 使用模拟数据
+				this.tabelList = mockTableData.getTableList(this.areaId, this.state);
+				this.updateTableStats();
+				
+				console.log('📊 桌台列表更新:', this.tabelList.length, '个桌台');
+			} catch (error) {
+				console.error('❌ 获取桌台列表失败:', error);
+			} finally {
+				this.tableLoading = false;
+			}
+		},
+		
+		updateTableStats() {
+			const stats = mockTableData.getTableStats();
+			this.nav.forEach(item => {
+				switch(item.state) {
+					case '':
+						item.num = stats.all;
+						break;
+					case 'free':
+						item.num = stats.free;
+						break;
+					case 'order':
+						item.num = stats.order;
+						break;
+					case 'settle':
+						item.num = stats.settle;
+						break;
+					case 'prepare':
+						item.num = stats.prepare;
+						break;
+					case 'machine':
+						item.num = stats.machine;
+						break;
+				}
+			});
+		},
 			async getTableList() {
 				try {
 					const {

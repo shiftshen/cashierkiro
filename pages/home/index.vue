@@ -50,12 +50,12 @@
 				<role-debug v-if="showDebug" :current="current" />
 				
 				<!-- 主要内容区域 - 修复角色检查逻辑 -->
-				<billing v-if="current==0 && (role.includes('diandan') || role.length === 0)" ref="billingRef" @openOver="getOpen" />
-				<desk v-if="current==1 && (role.includes('zhuotai') || role.length === 0)" ref="deskRef" @openOver="getOpen" />
+				<billing v-if="current==0" ref="billingRef" @openOver="getOpen" />
+				<desk v-if="current==1" ref="deskRef" @openOver="getOpen" />
 				<callOrder v-if="current==2 && (role.includes('jiaohao') || role.length === 0)" ref="callRef" />
 				<reconciliation v-if="current==3 && (role.includes('duizhang') || role.length === 0)" ref="recontionRef" />
 				<order v-if="current==4 && (role.includes('dingdan') || role.length === 0)" ref="orderRef" />
-				<member v-if="current==5 && (role.includes('huiyuan') || role.length === 0)" ref="memberRef" />
+				<member v-if="current==5" ref="memberRef" />
 				<verification v-if="current==6 && (role.includes('diandan') || role.length === 0)" @cT="changeTab" ref="verificationRef" />
 				<goods v-if="current==7 && (role.includes('goods') || role.length === 0)" ref="goodsRef" />
 				<staffs v-if="current==8 && (role.includes('diandan') || role.length === 0)" />
