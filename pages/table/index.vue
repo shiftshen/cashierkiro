@@ -73,7 +73,6 @@
 	import {
 		throttle
 	} from '@/common/handutil.js'
-	import offlineDataManager from '@/common/offline-data-manager.js'
 	export default {
 		components: {
 			serviceCharge,
@@ -213,76 +212,34 @@
 				// #endif
 			},
 			async getTableInfo() {
-				// 先尝试从缓存获取
-				const cacheKey = `table_${this.id}`
-				let cachedData = await offlineDataManager.getData(offlineDataManager.dataTypes.TABLE_STATUS, cacheKey)
-				
-				if (cachedData) {
-					console.log('📖 使用缓存的餐桌信息')
-					this.form = cachedData
+				let {
+					data
+				} = await this.beg.request({
+					url: `${this.api.inTabel}/${this.id}`,
+				})
+				console.log(data)
+				this.form = data ? data : {},
 					this.checkOut()
-				}
-				
-				// 发起网络请求更新数据
-				try {
-					let {
-						data
-					} = await this.beg.request({
-						url: `${this.api.inTabel}/${this.id}`,
-					})
-					console.log('🌐 获取最新餐桌信息', data)
-					this.form = data ? data : {}
-					
-					// 缓存最新数据
-					if (data) {
-						await offlineDataManager.setData(offlineDataManager.dataTypes.TABLE_STATUS, cacheKey, data)
-					}
-					
-					this.checkOut()
-				} catch (error) {
-					console.error('获取餐桌信息失败:', error)
-					if (!cachedData) {
-						uni.showToast({
-							title: '获取餐桌信息失败',
-							icon: 'error'
-						})
-					}
-				}
 			},
 			async getCategory() {
 				this.loading = true
-				
-				// 先尝试从缓存获取
-				const cacheKey = `category_${this.queryForm.state}`
-				let cachedData = await offlineDataManager.getData(offlineDataManager.dataTypes.GOODS_LIST, cacheKey)
-				
-				if (cachedData && cachedData.length > 0) {
-					console.log('📖 使用缓存的商品分类')
-					this.classfiy = cachedData
-					this.queryForm.categoryId = cachedData[0].id
-				}
-				
-				try {
-					let {
-						data: {
-							list,
-							total
-						},
-					} = await this.beg.request({
-						url: this.api.inGoodsCategory,
-						data: {
-							pageNo: 1,
-							pageSize: 999,
-							state: this.queryForm.state
-						},
-					})
-					console.log('🌐 获取最新商品分类', list)
-					this.classfiy = list ? list : []
-					
-					// 缓存最新数据
-					if (list && list.length > 0) {
-						await offlineDataManager.setData(offlineDataManager.dataTypes.GOODS_LIST, cacheKey, list)
-						this.queryForm.categoryId = list[0].id
+				let {
+					data: {
+						list,
+						total
+					},
+				} = await this.beg.request({
+					url: this.api.inGoodsCategory,
+					data: {
+						pageNo: 1,
+						pageSize: 999,
+						state: this.queryForm.state
+					},
+				})
+				console.log('12-12', list[0])
+				this.classfiy = list ? list : []
+				if (list && list.length > 0) {
+					this.queryForm.categoryId = list[0].id
 					this.$refs['rightGoodRef'].kind = 1
 				}
 
