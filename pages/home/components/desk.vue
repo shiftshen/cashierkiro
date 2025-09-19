@@ -339,12 +339,12 @@
 		}
 	}
 
-	// 底部统计颜色指示器 - 严格按照系统标准
+	// 底部统计颜色指示器 - 与界面完全一致
 	.bg0 { background-color: #374151 !important; } // 全部 - 黑色
-	.bf { background-color: #10b981 !important; }  // 空桌 - 绿色 (state=0) - VIP01应该是这个
-	.b23 { background-color: #ef4444 !important; } // 待点餐 - 红色 (state=1) - A01应该是这个
-	.bb3 { background-color: #f97316 !important; } // 待结账 - 橙色 (state=2)
-	.bdb { background-color: #64748b !important; } // 已预结 - 灰色 (state=4)
+	.bf { background-color: #f8fafc !important; }  // 空桌台 - 白色 (state=0)
+	.b23 { background-color: #10b981 !important; } // 待下单 - 绿色 (state=1)
+	.bb3 { background-color: #ef4444 !important; } // 待结账 - 红色 (state=2)
+	.bdb { background-color: #f97316 !important; } // 已预结 - 橙色 (state=4)
 	.b2e { background-color: #3b82f6 !important; } // 待清台 - 蓝色 (state=3)
 	
 	// 餐桌状态颜色 - 根据实际显示效果
@@ -353,33 +353,34 @@
 
 	// 餐桌状态颜色 - 与底部图例完全一致
 	.table {
-		// 空桌 - 绿色 (state=0 或 空桌)
+		// 空桌台 - 白色 (state=0)
 		&.bf {
+			background-color: #f8fafc !important;
+			color: #374151 !important;
+			border: 1px solid #d1d5db !important;
+		}
+		
+		// 待下单 - 绿色 (state=1)
+		&.b23 {
 			background-color: #10b981 !important;
 			color: white !important;
 		}
 		
-		// 待点餐 - 红色 (state=1)
-		&.b23 {
+		// 待结账 - 红色 (state=2)
+		&.bb3 {
 			background-color: #ef4444 !important;
 			color: white !important;
 		}
 		
-		// 待结账 - 橙色 (state=2)
-		&.bb3 {
-			background-color: #f97316 !important;
-			color: white !important;
-		}
-		
-		// 待清台 - 灰色 (state=3)
+		// 待清台 - 蓝色 (state=3)
 		&.b2e {
-			background-color: #64748b !important;
+			background-color: #3b82f6 !important;
 			color: white !important;
 		}
 		
-		// 已预结 - 蓝色 (state=4)
+		// 已预结 - 橙色 (state=4)
 		&.bdb {
-			background-color: #3b82f6 !important;
+			background-color: #f97316 !important;
 			color: white !important;
 		}
 		
