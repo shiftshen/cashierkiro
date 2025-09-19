@@ -73,6 +73,7 @@
 	import {
 		throttle
 	} from '@/common/handutil.js'
+	import goodsPreloader from '@/common/goods-preloader.js'
 	export default {
 		components: {
 			serviceCharge,
@@ -111,6 +112,7 @@
 				dataList: [],
 				loading: '',
 				total: 0,
+				preloaderInitialized: false, // 预加载器初始化标志
 				carList: {},
 				prentcarList: {},
 				list: [],
@@ -252,17 +254,37 @@
 				this.loading = false
 			},
 			async fetchData() {
+				// 初始化预加载器
+				if (!this.preloaderInitialized) {
+					await goodsPreloader.init(this.queryForm, this.api, this.beg)
+					this.preloaderInitialized = true
+				}
 
+				// 尝试从预加载器获取数据
+				try {
+					const pageData = await goodsPreloader.getPage(this.queryForm.pageNo || 1)
+					if (pageData) {
+						this.total = pageData.total
+						this.dataList = pageData.list
+						console.log('📦 使用预加载数据')
+						return
+					}
+				} catch (error) {
+					console.error('预加载器获取数据失败:', error)
+				}
+
+				// 降级到原始缓存逻辑
 				const cacheKey = `store_goods_list_${this.form.storeId}_${JSON.stringify(this.queryForm)}`
 				const cachedData = uni.getStorageSync(cacheKey)
-				// 如果有缓存，直接使用缓存数据
 				if (cachedData) {
-					console.log('我读取的缓存数据')
+					console.log('📖 使用本地缓存数据')
 					this.total = cachedData.total
 					this.dataList = cachedData.list
 					return
 				}
 
+				// 最后降级到网络请求
+				console.log('🌐 从服务器获取数据')
 				let {
 					data: {
 						list,
@@ -342,11 +364,32 @@
 			changeKind(v, i) {
 				this.queryForm.pageNo = 1
 				this.queryForm.categoryId = v.id
+				
+				// 更新预加载器查询条件
+				if (this.preloaderInitialized) {
+					goodsPreloader.updateQuery(this.queryForm)
+				}
+				
 				this.fetchData()
 			},
-			change(e) {
+			async change(e) {
 				this.queryForm.pageNo = e.current;
-				this.fetchData()
+				
+				// 使用预加载器获取数据
+				try {
+					const pageData = await goodsPreloader.getPage(e.current)
+					if (pageData) {
+						this.dataList = pageData.list
+						this.total = pageData.total
+						console.log(`⚡ 快速加载第 ${e.current} 页 (${pageData.list.length} 项)`)
+					} else {
+						// 预加载器失败，降级到原始方法
+						await this.fetchData()
+					}
+				} catch (error) {
+					console.error('预加载获取失败，使用原始方法:', error)
+					await this.fetchData()
+				}
 			},
 			async handcar(p) {
 				console.log('12-3', p)
