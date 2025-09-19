@@ -424,18 +424,12 @@
 			}
 		},
 		onLoad(option) {
-			console.log('页面加载，用户角色:', this.role);
-			console.log('页面选项:', option);
+			console.log('🚀 页面加载开始，用户角色:', this.role);
+			console.log('📋 页面选项:', option);
 			
-			if (option && option.current) {
-				this.current = option.current
-				this.l_title = option.l_title
-				this.id = option.id
-				this.changeInit(+option.current)
-			} else {
-				console.log('1212')
-				this.init()
-			}
+			// 强制初始化，确保页面刷新后能正常工作
+			this.forceInitialize(option);
+			
 			var that = this;
 			if (uni.getSystemInfoSync().platform === 'android' || uni.getSystemInfoSync().platform === 'ios') {
 				// 获取版本信息
@@ -451,28 +445,108 @@
 			this.getOpen()
 			// this.getProfix()
 		},
+		
+		// 添加页面显示时的处理
+		onShow() {
+			console.log('📱 页面显示，当前标签:', this.current);
+			// 确保页面显示时组件正确初始化
+			this.$nextTick(() => {
+				this.ensureComponentInitialized();
+			});
+		},
 		methods: {
 			...mapMutations(["setConfig", "setHandOver", "setUser"]),
 			// 刷新页面方法
 			refreshPage() {
 				location.reload();
 			},
+			
+			// 强制初始化方法
+			forceInitialize(option) {
+				console.log('🔧 强制初始化开始...');
+				
+				// 设置默认状态
+				if (option && option.current) {
+					this.current = parseInt(option.current);
+					this.l_title = option.l_title || this.getTabName(this.current);
+					this.id = option.id;
+					console.log('📋 从参数初始化:', { current: this.current, title: this.l_title });
+				} else {
+					// 默认显示订单页面
+					this.current = 0;
+					this.l_title = this.$t("home.order");
+					console.log('📋 使用默认初始化:', { current: this.current, title: this.l_title });
+				}
+				
+				// 延迟初始化组件，确保DOM已准备好
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.changeInit(this.current);
+						console.log('✅ 强制初始化完成');
+					}, 100);
+				});
+			},
+			
+			// 获取标签名称
+			getTabName(current) {
+				const tab = this.tabs.find(t => t.id === current);
+				return tab ? tab.name : this.$t("home.order");
+			},
+			
+			// 确保组件已初始化
+			ensureComponentInitialized() {
+				console.log('🔍 检查组件初始化状态，当前标签:', this.current);
+				
+				// 检查当前组件是否存在对应的ref
+				const refMap = {
+					0: 'billingRef',
+					1: 'deskRef', 
+					2: 'callRef',
+					3: 'recontionRef',
+					4: 'orderRef',
+					5: 'memberRef',
+					6: 'verificationRef',
+					7: 'goodsRef',
+					10: 'shiftRef',
+					13: 'printRef',
+					15: 'setGoodsRef',
+					61: 'verificationdlRef'
+				};
+				
+				const refName = refMap[this.current];
+				if (refName && this.$refs[refName]) {
+					console.log('✅ 组件已正确加载:', refName);
+				} else if (refName) {
+					console.warn('⚠️ 组件未加载，尝试重新初始化:', refName);
+					// 重新初始化
+					setTimeout(() => {
+						this.changeInit(this.current);
+					}, 200);
+				}
+			},
 			init() {
+				console.log('🔄 初始化订单组件...');
 				this.$nextTick(() => {
 					// 在 DOM 更新完成后访问 $refs
-					console.log('1212', this.$refs['billingRef']);
-					if (this.$refs['billingRef']) {
+					console.log('📋 检查billingRef:', this.$refs['billingRef']);
+					if (this.$refs['billingRef'] && this.$refs['billingRef'].init) {
 						this.$refs['billingRef'].init();
+						console.log('✅ 订单组件初始化成功');
+					} else {
+						console.warn('⚠️ 订单组件未准备好，延迟重试...');
+						// 延迟重试
+						setTimeout(() => {
+							if (this.$refs['billingRef'] && this.$refs['billingRef'].init) {
+								this.$refs['billingRef'].init();
+								console.log('✅ 订单组件延迟初始化成功');
+							}
+						}, 500);
 					}
 				});
-
-				// this.$nextTick(() => {
-				//  this.$refs['billingRef'].init())
-				// });
-
 			},
 			changeInit(t) {
-				console.log(t)
+				console.log('🔄 切换到标签:', t);
+				
 				if (t > 0) {
 					// #ifdef APP-PLUS
 					plug.sndMsgToHtml({
@@ -484,40 +558,68 @@
 					});
 					// #endif
 				}
+				
+				// 安全的组件初始化方法
+				const safeInit = (refName, componentName) => {
+					this.$nextTick(() => {
+						try {
+							if (this.$refs[refName] && this.$refs[refName].init) {
+								this.$refs[refName].init();
+								console.log(`✅ ${componentName}组件初始化成功`);
+							} else {
+								console.warn(`⚠️ ${componentName}组件未准备好，延迟重试...`);
+								// 延迟重试
+								setTimeout(() => {
+									if (this.$refs[refName] && this.$refs[refName].init) {
+										this.$refs[refName].init();
+										console.log(`✅ ${componentName}组件延迟初始化成功`);
+									} else {
+										console.error(`❌ ${componentName}组件初始化失败`);
+									}
+								}, 300);
+							}
+						} catch (error) {
+							console.error(`❌ ${componentName}组件初始化出错:`, error);
+						}
+					});
+				};
+				
 				switch (t) {
 					case 0:
-						this.$nextTick(() => this.$refs['billingRef'].init())
+						safeInit('billingRef', '订单');
 						break;
 					case 1:
-						this.$nextTick(() => this.$refs['deskRef'].init())
+						safeInit('deskRef', '餐桌');
 						break;
 					case 2:
-						this.$nextTick(() => this.$refs['callRef'].init())
+						safeInit('callRef', '叫号');
 						break;
 					case 3:
-						this.$nextTick(() => this.$refs['recontionRef'].init())
+						safeInit('recontionRef', '对账');
 						break;
 					case 4:
-						this.$nextTick(() => this.$refs['orderRef'].init())
+						safeInit('orderRef', '订单管理');
 						break;
 					case 5:
-						this.$nextTick(() => this.$refs['memberRef'].init())
+						safeInit('memberRef', '会员');
 						break;
 					case 61:
-						this.$nextTick(() => this.$refs['verificationdlRef'].init())
+						safeInit('verificationdlRef', '核销');
 						break;
 					case 7:
-						this.$nextTick(() => this.$refs['goodsRef'].init())
+						safeInit('goodsRef', '商品');
 						break;
 					case 10:
-						this.$nextTick(() => this.$refs['shiftRef'].init())
+						safeInit('shiftRef', '交班');
 						break;
 					case 13:
-						this.$nextTick(() => this.$refs['printRef'].init())
+						safeInit('printRef', '打印');
 						break;
 					case 15:
-						this.$nextTick(() => this.$refs['setGoodsRef'].init())
+						safeInit('setGoodsRef', '系统设置');
 						break;
+					default:
+						console.warn('⚠️ 未知的标签ID:', t);
 				}
 			},
 			handTabs(e) {
