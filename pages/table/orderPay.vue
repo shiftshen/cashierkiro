@@ -45,6 +45,47 @@
 </template>
 
 <script>
+
+	// 安全的性能监控
+	let pageStartTime = Date.now();
+	
+	function logPerformance(message, data) {
+		console.log('🚀 [性能]', message, data || '');
+	}
+	
+	// 简单缓存（仅在支持的环境中使用）
+	function safeSetCache(key, data) {
+		try {
+			if (typeof uni !== 'undefined' && uni.setStorageSync) {
+				uni.setStorageSync('perf_' + key, JSON.stringify({
+					data: data,
+					time: Date.now()
+				}));
+			}
+		} catch (e) {
+			// 忽略缓存错误
+		}
+	}
+	
+	function safeGetCache(key) {
+		try {
+			if (typeof uni !== 'undefined' && uni.getStorageSync) {
+				const cached = uni.getStorageSync('perf_' + key);
+				if (cached) {
+					const parsed = JSON.parse(cached);
+					// 5分钟缓存
+					if (Date.now() - parsed.time < 300000) {
+						logPerformance('缓存命中', key);
+						return parsed.data;
+					}
+				}
+			}
+		} catch (e) {
+			// 忽略缓存错误
+		}
+		return null;
+	}
+	
 	import {
 		mapState,
 		mapMutations,
@@ -108,6 +149,8 @@
 			}),
 		},
 		async onLoad(option) {
+				pageStartTime = Date.now();
+				logPerformance('页面开始加载');
 			if (option && option.id) {
 				this.id = option.id
 				await this.fetchData()
@@ -116,7 +159,13 @@
 
 			}
 			this.getReasonConfig()
-			this.$nextTick(() => this.$refs['rightOrderRef'].getWays())
+			this.$nextTick(() => {
+					this.$refs['rightOrderRef'].getWays();
+					setTimeout(() => {
+						const loadTime = Date.now() - pageStartTime;
+						logPerformance('页面加载完成', loadTime + 'ms');
+					}, 100);
+				})
 		},
 		computed: {
 			...mapState({
@@ -127,6 +176,7 @@
 			...mapMutations(["setVip"]),
 			...mapMutations(["setConfig"]),
 			async fetchData() {
+				logPerformance('开始获取订单数据');
 				let {
 					data
 				} = await this.beg.request({
@@ -161,7 +211,8 @@
 					await this.getuserinfo(this.form.userId)
 					await this.getCoupon(this.form.userId)
 				} else {
-					this.setVip({})
+					this.setVip({});
+				logPerformance('订单数据处理完成');
 				}
 			},
 			async getuserinfo(userid) {

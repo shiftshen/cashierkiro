@@ -46,6 +46,9 @@
 		<!-- <share :share="share" @closeShare="share=false" /> -->
 		<!-- <addDish :addDish="addDish" @closeAdd="addDish=false" /> -->
 		<goodsNum ref="goodsNumRef" @changeValue="changeValue" :tx="$t('goods-components.change_quantity')"></goodsNum>
+		
+		<!-- 预加载进度显示 -->
+		<preloadProgress></preloadProgress>
 
 	</view>
 </template>
@@ -69,11 +72,15 @@
 	import leftCz from '@/components/order/leftcz.vue';
 	import rightGoods from './components/rightGoods.vue';
 	import goodsNum from '@/components/goods/goodsNum.vue';
+	import preloadProgress from '@/components/preload/preload-progress.vue';
 	import site from '@/custom/siteroot.js';
 	import {
 		throttle
 	} from '@/common/handutil.js'
 	import goodsPreloader from '@/common/goods-preloader.js'
+	import categoryPreloader from '@/common/category-preloader.js'
+	import cacheManager from '@/common/cache-manager.js'
+	import categoryQuickSwitcher from '@/common/category-quick-switcher.js'
 	export default {
 		components: {
 			serviceCharge,
@@ -86,6 +93,7 @@
 			leftCz,
 			rightGoods,
 			goodsNum,
+			preloadProgress,
 		},
 
 		data() {
@@ -225,26 +233,42 @@
 			},
 			async getCategory() {
 				this.loading = true
-				let {
-					data: {
-						list,
-						total
-					},
-				} = await this.beg.request({
-					url: this.api.inGoodsCategory,
-					data: {
-						pageNo: 1,
-						pageSize: 999,
-						state: this.queryForm.state
-					},
-				})
-				console.log('12-12', list[0])
-				this.classfiy = list ? list : []
-				if (list && list.length > 0) {
-					this.queryForm.categoryId = list[0].id
-					this.$refs['rightGoodRef'].kind = 1
+				
+				// 先尝试从分类预加载器获取
+				const cachedCategories = categoryPreloader.getAllCategories()
+				if (cachedCategories && cachedCategories.length > 0) {
+					console.log('📖 使用缓存的分类数据')
+					this.classfiy = [...cachedCategories]
+					
+					if (this.classfiy.length > 0) {
+						this.queryForm.categoryId = this.classfiy[0].id
+						this.$refs['rightGoodRef'].kind = 1
+					}
+				} else {
+					// 降级到网络请求
+					console.log('🌐 从服务器获取分类数据')
+					let {
+						data: {
+							list,
+							total
+						},
+					} = await this.beg.request({
+						url: this.api.inGoodsCategory,
+						data: {
+							pageNo: 1,
+							pageSize: 999,
+							state: this.queryForm.state
+						},
+					})
+					console.log('12-12', list[0])
+					this.classfiy = list ? list : []
+					if (list && list.length > 0) {
+						this.queryForm.categoryId = list[0].id
+						this.$refs['rightGoodRef'].kind = 1
+					}
 				}
 
+				// 添加"全部"选项
 				this.classfiy.unshift({
 					name: this.$t('table.all'),
 					id: '',
@@ -254,23 +278,58 @@
 				this.loading = false
 			},
 			async fetchData() {
-				// 初始化预加载器
+				// 初始化预加载器 - 确保在页面加载时就开始
 				if (!this.preloaderInitialized) {
-					await goodsPreloader.init(this.queryForm, this.api, this.beg)
+					console.log('🚀 初始化预加载器...')
 					this.preloaderInitialized = true
+					
+					// 立即初始化快速切换器
+					categoryQuickSwitcher.init(this.api, this.beg, this.queryForm)
+					
+					// 异步初始化完整预加载器
+					Promise.all([
+						goodsPreloader.init(this.queryForm, this.api, this.beg),
+						categoryPreloader.initFullPreload(this.api, this.beg, this.queryForm)
+					]).then(() => {
+						console.log('✅ 预加载器初始化完成')
+						uni.$emit('preload-complete')
+					}).catch(error => {
+						console.error('❌ 预加载器初始化失败:', error)
+					})
+					
+					// 显示离线状态
+					setTimeout(() => {
+						goodsPreloader.showOfflineStatus()
+					}, 2000) // 等待预加载完成后显示状态
 				}
 
-				// 尝试从预加载器获取数据
+				// 优先从分类预加载器获取数据
+				try {
+					const categoryData = categoryPreloader.getCategoryGoods(
+						this.queryForm.categoryId, 
+						this.queryForm.pageNo || 1
+					)
+					if (categoryData) {
+						this.total = categoryData.total
+						this.dataList = categoryData.list
+						console.log('🏷️ 使用分类预加载数据')
+						return
+					}
+				} catch (error) {
+					console.error('分类预加载器获取数据失败:', error)
+				}
+
+				// 降级到商品预加载器
 				try {
 					const pageData = await goodsPreloader.getPage(this.queryForm.pageNo || 1)
 					if (pageData) {
 						this.total = pageData.total
 						this.dataList = pageData.list
-						console.log('📦 使用预加载数据')
+						console.log('📦 使用商品预加载数据')
 						return
 					}
 				} catch (error) {
-					console.error('预加载器获取数据失败:', error)
+					console.error('商品预加载器获取数据失败:', error)
 				}
 
 				// 降级到原始缓存逻辑
@@ -361,35 +420,74 @@
 				this.queryForm.keyword = n
 				this.fetchData()
 			},
-			changeKind(v, i) {
+			async changeKind(v, i) {
 				this.queryForm.pageNo = 1
 				this.queryForm.categoryId = v.id
+				
+				console.log(`🔄 切换分类: ${v.name} (ID: ${v.id})`)
+				
+				// 第一优先级：快速切换器
+				const quickData = await categoryQuickSwitcher.getQuickData(v.id, 1)
+				if (quickData && quickData.list && quickData.list.length > 0) {
+					this.dataList = quickData.list
+					this.total = quickData.total
+					console.log(`⚡ 快速切换命中: ${v.name} (${quickData.list.length} 项)`)
+					return
+				}
+				
+				// 第二优先级：分类预加载器
+				const categoryData = categoryPreloader.getCategoryGoods(v.id, 1)
+				if (categoryData && categoryData.list && categoryData.list.length > 0) {
+					this.dataList = categoryData.list
+					this.total = categoryData.total
+					console.log(`📦 分类缓存命中: ${v.name} (${categoryData.list.length} 项)`)
+					return
+				}
+				
+				console.log(`🌐 缓存未命中，使用网络请求: ${v.name}`)
 				
 				// 更新预加载器查询条件
 				if (this.preloaderInitialized) {
 					goodsPreloader.updateQuery(this.queryForm)
 				}
 				
-				this.fetchData()
+				// 降级到fetchData
+				await this.fetchData()
 			},
 			async change(e) {
 				this.queryForm.pageNo = e.current;
 				
-				// 使用预加载器获取数据
+				// 优先使用分类预加载器
+				try {
+					const categoryData = categoryPreloader.getCategoryGoods(
+						this.queryForm.categoryId, 
+						e.current
+					)
+					if (categoryData) {
+						this.dataList = categoryData.list
+						this.total = categoryData.total
+						console.log(`🏷️ 分类缓存快速加载第 ${e.current} 页 (${categoryData.list.length} 项)`)
+						return
+					}
+				} catch (error) {
+					console.error('分类预加载获取失败:', error)
+				}
+				
+				// 降级到商品预加载器
 				try {
 					const pageData = await goodsPreloader.getPage(e.current)
 					if (pageData) {
 						this.dataList = pageData.list
 						this.total = pageData.total
-						console.log(`⚡ 快速加载第 ${e.current} 页 (${pageData.list.length} 项)`)
-					} else {
-						// 预加载器失败，降级到原始方法
-						await this.fetchData()
+						console.log(`📦 商品缓存快速加载第 ${e.current} 页 (${pageData.list.length} 项)`)
+						return
 					}
 				} catch (error) {
-					console.error('预加载获取失败，使用原始方法:', error)
-					await this.fetchData()
+					console.error('商品预加载获取失败:', error)
 				}
+				
+				// 最后降级到原始方法
+				await this.fetchData()
 			},
 			async handcar(p) {
 				console.log('12-3', p)
@@ -899,6 +997,22 @@
 				})
 				this.$refs['goodsNumRef'].close()
 			},
+			
+			// 缓存管理方法
+			async clearGoodsCache() {
+				try {
+					await cacheManager.clearCache('goods')
+					// 重新初始化预加载器
+					this.preloaderInitialized = false
+					await this.fetchData()
+				} catch (error) {
+					console.error('清理缓存失败:', error)
+				}
+			},
+			
+			getCacheStats() {
+				return cacheManager.getCacheStats()
+			}
 		}
 	}
 </script>

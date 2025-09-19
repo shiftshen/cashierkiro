@@ -1,59 +1,21 @@
-<!DOCTYPE html><html lang=zh-CN><head>
-    <base href="./"><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><title>DAMO CASHIER</title><script>var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') || CSS.supports('top: constant(a)'))
-            document.write('<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' + (coverSupport ? ', viewport-fit=cover' : '') + '" />')</script><link rel=stylesheet href=static/index.2da1efab.css>
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="static/manifest.json">
-  
-  <!-- PWA Meta Tags -->
-  <meta name="theme-color" content="#4275F4">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="DAMO收银">
-  
-  <!-- PWA Icons -->
-  <link rel="apple-touch-icon" href="static/icons/icon-192x192.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="static/icons/icon-192x192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="static/icons/icon-512x512.png">
-  
-  <!-- Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('static/sw.js')
-          .then(registration => {
-            console.log('SW registered: ', registration);
-          })
-          .catch(registrationError => {
-            console.log('SW registration failed: ', registrationError);
-          });
-      });
-    }
-  </script>\n</head><body><noscript><strong>Please enable JavaScript to continue.</strong></noscript><div id=app></div><script src=static/js/chunk-vendors.ec6b5629.js></script><script src=static/js/index.cab1356c.js></script>
-<script>
-// 错误处理和调试
-window.addEventListener('error', function(e) {
-    console.error('页面错误:', e.error);
-    console.error('文件:', e.filename);
-    console.error('行号:', e.lineno);
-});
-
-// 资源加载错误处理
-window.addEventListener('load', function() {
-    console.log('页面加载完成');
-    
-    // 检查关键元素
-    const app = document.getElementById('app');
-    if (app && app.innerHTML.trim() === '') {
-        console.warn('⚠️ App 容器为空，可能存在 JS 加载问题');
-    }
-});
-
-// 检查 Vue 是否加载
-setTimeout(function() {
-    if (typeof Vue === 'undefined' && typeof window.Vue === 'undefined') {
-        console.error('❌ Vue 未加载');
-        document.getElementById('app').innerHTML = '<div style="padding: 20px; text-align: center;"><h2>应用加载失败</h2><p>请检查网络连接或刷新页面</p></div>';
-    }
-}, 3000);
-</script>
-</body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>DAMO CASHIER</title>
+    <script>
+        var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') || CSS.supports('top: constant(a)'))
+        document.write('<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' + (coverSupport ? ', viewport-fit=cover' : '') + '" />')
+    </script>
+    <link rel="stylesheet" href="static/index.2da1efab.css">
+</head>
+<body>
+    <noscript>
+        <strong>We're sorry but DAMO CASHIER doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <script src="static/js/chunk-vendors.ec6b5629.js"></script>
+    <script src="static/js/index.cab1356c.js"></script>
+</body>
+</html>

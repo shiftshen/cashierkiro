@@ -8,8 +8,9 @@ class GoodsPreloader {
     this.cache = new Map()
     this.preloadQueue = []
     this.isPreloading = false
-    this.maxCachePages = 10 // 最多缓存10页
+    this.maxCachePages = 20 // 增加缓存页数，支持全部预加载
     this.preloadDistance = 2 // 预加载前后2页
+    this.totalPages = 10 // 总页数，默认8页
   }
 
   /**
@@ -23,10 +24,20 @@ class GoodsPreloader {
     this.api = api
     this.beg = beg
     
-    console.log('🚀 开始预加载商品数据...')
+    console.log('🚀 开始预加载所有商品数据...')
     
-    // 预加载前3页数据
-    await this.preloadPages([1, 2, 3])
+    // 先加载第1页获取总页数
+    const firstPage = await this.loadPage(1)
+    if (firstPage && firstPage.total) {
+      // 计算总页数
+      const pageSize = queryForm.pageSize || 30
+      this.totalPages = Math.ceil(firstPage.total / pageSize)
+      console.log(`📊 检测到总共 ${this.totalPages} 页商品数据`)
+    }
+    
+    // 预加载所有页面
+    const allPages = Array.from({length: this.totalPages}, (_, i) => i + 1)
+    await this.preloadAllPages(allPages)
   }
 
   /**
@@ -44,6 +55,45 @@ class GoodsPreloader {
       console.log(`✅ 预加载完成: 页面 ${pages.join(', ')}`)
     } catch (error) {
       console.error('预加载失败:', error)
+    } finally {
+      this.isPreloading = false
+    }
+  }
+
+  /**
+   * 预加载所有页面 (分批进行，避免并发过多)
+   * @param {Array} pages - 页码数组
+   */
+  async preloadAllPages(pages) {
+    if (this.isPreloading) return
+    
+    this.isPreloading = true
+    console.log(`🔄 开始预加载全部 ${pages.length} 页数据...`)
+    
+    try {
+      const batchSize = 3 // 每批3页，避免并发过多
+      let loadedCount = 0
+      
+      for (let i = 0; i < pages.length; i += batchSize) {
+        const batch = pages.slice(i, i + batchSize)
+        const promises = batch.map(pageNo => this.loadPage(pageNo))
+        
+        await Promise.all(promises)
+        loadedCount += batch.length
+        
+        console.log(`📦 已预加载 ${loadedCount}/${pages.length} 页`)
+        
+        // 小延迟，避免请求过于密集
+        if (i + batchSize < pages.length) {
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+      }
+      
+      console.log(`🎉 全部商品数据预加载完成！共 ${pages.length} 页`)
+      console.log('📱 应用现在完全支持离线浏览商品')
+      
+    } catch (error) {
+      console.error('批量预加载失败:', error)
     } finally {
       this.isPreloading = false
     }
@@ -82,8 +132,8 @@ class GoodsPreloader {
       // 存入缓存
       this.cache.set(cacheKey, pageData)
       
-      // 限制缓存大小
-      if (this.cache.size > this.maxCachePages) {
+      // 限制缓存大小 (但允许缓存所有页面)
+      if (this.cache.size > this.maxCachePages && this.cache.size > this.totalPages) {
         const firstKey = this.cache.keys().next().value
         this.cache.delete(firstKey)
       }
@@ -168,9 +218,21 @@ class GoodsPreloader {
       this.clearCache()
       this.queryForm = { ...newQueryForm }
       
-      // 重新预加载前几页
-      setTimeout(() => {
-        this.preloadPages([1, 2, 3])
+      // 重新预加载所有页面
+      setTimeout(async () => {
+        console.log('🔄 查询条件变化，重新预加载所有数据...')
+        
+        // 先加载第1页获取新的总页数
+        const firstPage = await this.loadPage(1)
+        if (firstPage && firstPage.total) {
+          const pageSize = newQueryForm.pageSize || 30
+          this.totalPages = Math.ceil(firstPage.total / pageSize)
+          console.log(`📊 新查询条件下共 ${this.totalPages} 页数据`)
+        }
+        
+        // 预加载所有页面
+        const allPages = Array.from({length: this.totalPages}, (_, i) => i + 1)
+        await this.preloadAllPages(allPages)
       }, 100)
     }
   }
@@ -215,6 +277,51 @@ class GoodsPreloader {
     const cacheKey = this.getCacheKey(pageNo)
     this.cache.delete(cacheKey)
     return await this.loadPage(pageNo)
+  }
+
+  /**
+   * 检查离线可用性
+   */
+  checkOfflineAvailability() {
+    const totalCached = this.cache.size
+    const offlineRate = (totalCached / this.totalPages) * 100
+    
+    const status = {
+      totalPages: this.totalPages,
+      cachedPages: totalCached,
+      offlineRate: Math.round(offlineRate),
+      isFullyOffline: totalCached >= this.totalPages,
+      missingPages: []
+    }
+    
+    // 检查缺失的页面
+    for (let i = 1; i <= this.totalPages; i++) {
+      const cacheKey = this.getCacheKey(i)
+      if (!this.cache.has(cacheKey)) {
+        status.missingPages.push(i)
+      }
+    }
+    
+    return status
+  }
+
+  /**
+   * 显示离线状态
+   */
+  showOfflineStatus() {
+    const status = this.checkOfflineAvailability()
+    
+    console.log('📱 离线可用性状态:')
+    console.log(`   总页数: ${status.totalPages}`)
+    console.log(`   已缓存: ${status.cachedPages} 页`)
+    console.log(`   离线率: ${status.offlineRate}%`)
+    console.log(`   完全离线: ${status.isFullyOffline ? '✅ 是' : '❌ 否'}`)
+    
+    if (status.missingPages.length > 0) {
+      console.log(`   缺失页面: ${status.missingPages.join(', ')}`)
+    }
+    
+    return status
   }
 }
 

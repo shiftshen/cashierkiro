@@ -27,9 +27,36 @@ export default {
           contentType: config.contentType,
           appType: 'cashier',
           lang: i18n.locale,
-          uniacid: uni.getStorageSync('uniacid'),
-          storeId: uni.getStorageSync('storeId'),
-          Authorization: `Bearer ${uni.getStorageSync('token')}`,
+          uniacid: (function() {
+            try {
+              return (function() {
+            try {
+              return uni.getStorageSync('uniacid')
+            } catch (error) {
+              console.warn('Storage operation failed:', error)
+              return null
+            }
+          })(),
+          storeId: (function() {
+            try {
+              return (function() {
+            try {
+              return uni.getStorageSync('storeId')
+            } catch (error) {
+              console.warn('Storage operation failed:', error)
+              return null
+            }
+          })(),
+          Authorization: `Bearer ${(function() {
+            try {
+              return (function() {
+            try {
+              return uni.getStorageSync('token')
+            } catch (error) {
+              console.warn('Storage operation failed:', error)
+              return null
+            }
+          })()}`,
         },
         complete: (res) => {
           if (option.mask) {
@@ -44,8 +71,26 @@ export default {
               config.tokenErrorMessage(res.data.msg || res.msg)
             } else if (res?.data?.code == 401) {
               config.tokenErrorMessage(res.data.msg || res.msg)
-              uni.removeStorageSync('token')
-              uni.removeStorageSync('storeId')
+              (function() {
+            try {
+              return (function() {
+            try {
+              return uni.removeStorageSync('token')
+            } catch (error) {
+              console.warn('Storage operation failed:', error)
+              return null
+            }
+          })()
+              (function() {
+            try {
+              return (function() {
+            try {
+              return uni.removeStorageSync('storeId')
+            } catch (error) {
+              console.warn('Storage operation failed:', error)
+              return null
+            }
+          })()
               uni.reLaunch({
                 url: `/pages/login/index`
               })

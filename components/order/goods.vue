@@ -11,14 +11,14 @@
 			</view>
 			<block v-if="cashieSetting && cashieSetting.productShow==2">
 				<view :class="list.some(f=>f.spuId==v.id)?'check':''" class="r_item p5 productShow2"
-					v-for="(v, i) in dataList" :key="i" @click.stop="handcar({g: v,addwz: 1})">
+					v-for="(v, i) in dataList" :key="(v, i)[0].id || (v, i)[1]" :key="i" @click.stop="handcar({g: v,addwz: 1})">
 					<view class="f-bt f18">
-						<image class="f-g-0 mr10 logo" :src="v.logo" lazy-load mode="aspectFill"></image>
+						<image loading="lazy" class="f-g-0 mr10 logo" :src="v.logo" lazy-load mode="aspectFill"></image>
 						<view class="f-y-bt f18 f-g-1">
 							<view class="f18 mb5 wordall2">{{v.name}}</view>
 							<view class="labels" v-if="v.discounts && v.discounts.length">
 								<view class="label goodlb" :style="{color:'#FF3131',borderColor:'#FF3131'}"
-									v-for="(lv,li) in v.discounts" :key="li">{{lv.discountLabel}}</view>
+									v-for="(lv,li) in v.discounts" :key="(lv,li)[0].id || (lv,li)[1]" :key="li">{{lv.discountLabel}}</view>
 							</view>
 							<view>
 								<view v-if="v.isSpec" class="mb5 c0 f18 overflowlnr">
@@ -43,12 +43,12 @@
 				</view>
 			</block>
 			<block v-else>
-				<view :class="list.some(f=>f.spuId==v.id)?'check':''" class="r_item p5" v-for="(v, i) in dataList"
+				<view :class="list.some(f=>f.spuId==v.id)?'check':''" class="r_item p5" v-for="(v, i) in dataList" :key="(v, i)[0].id || (v, i)[1]"
 					:key="i" @click.stop="handcar({g: v,addwz: 1})">
 					<view class="flex f18 wordall2">{{v.name}}</view>
 					<view class="labels" v-if="v.discounts && v.discounts.length">
 						<view class="label goodlb" :style="{color:'#FF3131',borderColor:'#FF3131'}"
-							v-for="(lv,li) in v.discounts" :key="li">{{lv.discountLabel}}</view>
+							v-for="(lv,li) in v.discounts" :key="(lv,li)[0].id || (lv,li)[1]" :key="li">{{lv.discountLabel}}</view>
 					</view>
 					<view class="dfa f18 mt5 l-h1">
 						<view>
@@ -117,6 +117,7 @@
 		},
 		data() {
 			return {
+                handcarTimer: null,
 				carList: {},
 				product: {},
 				productModalVisible: false,
@@ -131,16 +132,42 @@
 				cashieSetting: state => state.config.cashieSetting,
 			}),
 		},
+        watch: {
+          list: {
+            handler() {
+              // 清理显示数量缓存
+              if (this._displayNumCache) {
+                this._displayNumCache.clear()
+              }
+            },
+            deep: true
+          }
+        },
 		methods: {
 			getDisplayNum(spuId) {
-				const item = this.list.find(f => f.spuId === spuId);
-				console.log(item)
-				if (item) {
-					return item.goods.weightSwitch==1 ? (item.num / 100) : item.num;
-				}
+        // 使用缓存优化查找
+        if (!this._displayNumCache) {
+          this._displayNumCache = new Map()
+        }
+        
+        if (this._displayNumCache.has(spuId)) {
+          return this._displayNumCache.get(spuId)
+        }
+        
+        const item = this.list.find(f => f.spuId === spuId)
+        const result = item ? (item.goods.weightSwitch == 1 ? (item.num / 100) : item.num) : 0
+        
+        this._displayNumCache.set(spuId, result)
+        return result
+      }
 				return 0; // 如果找不到对应的项，可以返回一个默认值，比如0
 			},
 			async handcar(e) {
+            // 防抖处理
+            if (this.handcarTimer) {
+              clearTimeout(this.handcarTimer)
+            }
+            this.handcarTimer = setTimeout(async () => {
 				if (e.g.goodsInventory == 0) return
 				
 				if (e.g.weightSwitch == 1) {
