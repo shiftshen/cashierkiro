@@ -222,7 +222,14 @@
 					const roleData = state.user?.roleData || [];
 					if (roleData.length === 0) {
 						console.warn('用户角色为空，使用默认权限');
-						// 提供基本权限，确保至少能看到订单页面
+						// APP环境下提供完整权限，确保所有功能可用
+						// #ifdef APP-PLUS
+						return ['diandan', 'zhuotai', 'jiaohao', 'duizhang', 'dingdan', 'huiyuan', 'goods', 'jiaoban', 'yingjian', 'xitong'];
+						// #endif
+						// H5环境下提供基本权限
+						// #ifdef H5
+						return ['diandan', 'zhuotai'];
+						// #endif
 						return ['diandan', 'zhuotai'];
 					}
 					return roleData;

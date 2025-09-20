@@ -1,298 +1,309 @@
 <template>
-  <view class="role-debug" v-if="showDebug">
+  <view class="role-debug">
     <view class="debug-header">
-      <text class="debug-title">角色调试面板</text>
-      <text class="debug-close" @click="closeDebug">×</text>
+      <text class="debug-title">🔍 角色调试信息</text>
+      <button class="close-btn" @click="$emit('close')">×</button>
     </view>
+    
     <view class="debug-content">
       <view class="debug-section">
-        <text class="section-title">当前用户信息</text>
-        <view class="info-item">
-          <text>用户ID: {{ userInfo.id || 'N/A' }}</text>
+        <text class="section-title">当前状态</text>
+        <view class="debug-item">
+          <text class="label">当前标签:</text>
+          <text class="value">{{ current }}</text>
         </view>
-        <view class="info-item">
-          <text>用户名: {{ userInfo.username || 'N/A' }}</text>
+        <view class="debug-item">
+          <text class="label">标签名称:</text>
+          <text class="value">{{ getTabName(current) }}</text>
         </view>
-        <view class="info-item">
-          <text>角色: {{ userInfo.role || 'N/A' }}</text>
-        </view>
-        <view class="info-item">
-          <text>权限: {{ userInfo.permissions ? userInfo.permissions.join(', ') : 'N/A' }}</text>
-        </view>
-      </view>
-      
-      <view class="debug-section">
-        <text class="section-title">店铺信息</text>
-        <view class="info-item">
-          <text>店铺ID: {{ storeInfo.id || 'N/A' }}</text>
-        </view>
-        <view class="info-item">
-          <text>店铺名称: {{ storeInfo.name || 'N/A' }}</text>
-        </view>
-        <view class="info-item">
-          <text>UNIACID: {{ storeInfo.uniacid || 'N/A' }}</text>
+        <view class="debug-item">
+          <text class="label">运行环境:</text>
+          <text class="value">{{ getPlatform() }}</text>
         </view>
       </view>
       
       <view class="debug-section">
-        <text class="section-title">系统状态</text>
-        <view class="info-item">
-          <text>登录状态: {{ isLoggedIn ? '已登录' : '未登录' }}</text>
+        <text class="section-title">用户角色</text>
+        <view class="debug-item">
+          <text class="label">角色数组:</text>
+          <text class="value">{{ JSON.stringify(userRole) }}</text>
         </view>
-        <view class="info-item">
-          <text>网络状态: {{ networkStatus }}</text>
+        <view class="debug-item">
+          <text class="label">角色长度:</text>
+          <text class="value">{{ userRole.length }}</text>
         </view>
-        <view class="info-item">
-          <text>设备类型: {{ deviceType }}</text>
+        <view class="debug-item">
+          <text class="label">是否为空:</text>
+          <text class="value">{{ userRole.length === 0 ? '是' : '否' }}</text>
+        </view>
+      </view>
+      
+      <view class="debug-section">
+        <text class="section-title">组件匹配</text>
+        <view class="debug-item">
+          <text class="label">需要角色:</text>
+          <text class="value">{{ getRequiredRole(current) }}</text>
+        </view>
+        <view class="debug-item">
+          <text class="label">权限检查:</text>
+          <text class="value">{{ hasPermission(current) ? '通过' : '失败' }}</text>
+        </view>
+        <view class="debug-item">
+          <text class="label">组件应显示:</text>
+          <text class="value">{{ shouldShowComponent(current) ? '是' : '否' }}</text>
+        </view>
+      </view>
+      
+      <view class="debug-section">
+        <text class="section-title">存储数据</text>
+        <view class="debug-item">
+          <text class="label">Token:</text>
+          <text class="value">{{ getStorageData('token') ? '已设置' : '未设置' }}</text>
+        </view>
+        <view class="debug-item">
+          <text class="label">Store ID:</text>
+          <text class="value">{{ getStorageData('storeId') || '未设置' }}</text>
+        </view>
+        <view class="debug-item">
+          <text class="label">用户信息:</text>
+          <text class="value">{{ getStorageData('user') ? '已设置' : '未设置' }}</text>
         </view>
       </view>
       
       <view class="debug-actions">
-        <button class="debug-btn" @click="refreshUserInfo">刷新用户信息</button>
-        <button class="debug-btn" @click="clearCache">清除缓存</button>
-        <button class="debug-btn" @click="exportLogs">导出日志</button>
+        <button class="debug-btn" @click="forceShowAll">强制显示所有组件</button>
+        <button class="debug-btn" @click="resetRole">重置角色权限</button>
+        <button class="debug-btn" @click="refreshPage">刷新页面</button>
       </view>
     </view>
   </view>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   name: 'RoleDebug',
-  data() {
-    return {
-      showDebug: false,
-      userInfo: {},
-      storeInfo: {},
-      isLoggedIn: false,
-      networkStatus: 'unknown',
-      deviceType: 'unknown'
-    };
-  },
-  
-  mounted() {
-    // 开发环境下自动显示调试面板
-    // #ifdef H5
-    if (process.env.NODE_ENV === 'development') {
-      this.showDebug = true;
+  props: {
+    current: {
+      type: Number,
+      default: 0
     }
-    // #endif
-    
-    this.initDebugInfo();
   },
-  
+  computed: {
+    ...mapState({
+      userRole: state => state.user?.roleData || []
+    })
+  },
   methods: {
-    // 初始化调试信息
-    initDebugInfo() {
-      this.getUserInfo();
-      this.getStoreInfo();
-      this.getSystemStatus();
+    getPlatform() {
+      // #ifdef APP-PLUS
+      return 'APP-PLUS';
+      // #endif
+      // #ifdef H5
+      return 'H5';
+      // #endif
+      return 'Unknown';
     },
     
-    // 获取用户信息
-    getUserInfo() {
-      try {
-        const token = uni.getStorageSync('token');
-        const userStr = uni.getStorageSync('userInfo');
-        
-        this.isLoggedIn = !!token;
-        
-        if (userStr) {
-          this.userInfo = JSON.parse(userStr);
-        } else {
-          this.userInfo = {
-            id: 'N/A',
-            username: 'N/A',
-            role: 'N/A',
-            permissions: []
-          };
-        }
-      } catch (error) {
-        console.error('Failed to get user info:', error);
-        this.userInfo = {};
-      }
-    },
-    
-    // 获取店铺信息
-    getStoreInfo() {
-      try {
-        this.storeInfo = {
-          id: uni.getStorageSync('storeId') || 'N/A',
-          name: uni.getStorageSync('storeName') || 'N/A',
-          uniacid: uni.getStorageSync('uniacid') || 'N/A'
-        };
-      } catch (error) {
-        console.error('Failed to get store info:', error);
-        this.storeInfo = {};
-      }
-    },
-    
-    // 获取系统状态
-    getSystemStatus() {
-      // 获取网络状态
-      uni.getNetworkType({
-        success: (res) => {
-          this.networkStatus = res.networkType;
-        },
-        fail: () => {
-          this.networkStatus = 'unknown';
-        }
-      });
-      
-      // 获取设备类型
-      uni.getSystemInfo({
-        success: (res) => {
-          this.deviceType = res.platform;
-        },
-        fail: () => {
-          this.deviceType = 'unknown';
-        }
-      });
-    },
-    
-    // 刷新用户信息
-    refreshUserInfo() {
-      this.initDebugInfo();
-      uni.showToast({
-        title: '信息已刷新',
-        icon: 'success'
-      });
-    },
-    
-    // 清除缓存
-    clearCache() {
-      try {
-        uni.clearStorageSync();
-        uni.showToast({
-          title: '缓存已清除',
-          icon: 'success'
-        });
-        
-        // 重新获取信息
-        setTimeout(() => {
-          this.initDebugInfo();
-        }, 1000);
-      } catch (error) {
-        console.error('Failed to clear cache:', error);
-        uni.showToast({
-          title: '清除缓存失败',
-          icon: 'error'
-        });
-      }
-    },
-    
-    // 导出日志
-    exportLogs() {
-      const logs = {
-        timestamp: new Date().toISOString(),
-        userInfo: this.userInfo,
-        storeInfo: this.storeInfo,
-        systemStatus: {
-          isLoggedIn: this.isLoggedIn,
-          networkStatus: this.networkStatus,
-          deviceType: this.deviceType
-        }
+    getTabName(current) {
+      const tabNames = {
+        0: '订单',
+        1: '桌台',
+        2: '叫号',
+        3: '对账',
+        4: '订单管理',
+        5: '会员',
+        6: '核销',
+        7: '商品',
+        8: '员工',
+        9: '退款',
+        10: '交班',
+        11: '信息',
+        12: '设置',
+        13: '打印',
+        15: '商品设置',
+        61: '核销DL'
       };
-      
-      console.log('Debug Logs:', JSON.stringify(logs, null, 2));
-      
+      return tabNames[current] || '未知';
+    },
+    
+    getRequiredRole(current) {
+      const roleMap = {
+        0: 'diandan',
+        1: 'zhuotai',
+        2: 'jiaohao',
+        3: 'duizhang',
+        4: 'dingdan',
+        5: 'huiyuan',
+        6: 'diandan',
+        7: 'goods',
+        8: 'diandan',
+        9: 'diandan',
+        10: 'jiaoban',
+        11: 'diandan',
+        12: 'diandan',
+        13: 'yingjian',
+        15: 'xitong',
+        61: 'diandan'
+      };
+      return roleMap[current] || '无需权限';
+    },
+    
+    hasPermission(current) {
+      const requiredRole = this.getRequiredRole(current);
+      if (requiredRole === '无需权限') return true;
+      return this.userRole.includes(requiredRole) || this.userRole.length === 0;
+    },
+    
+    shouldShowComponent(current) {
+      return this.hasPermission(current);
+    },
+    
+    getStorageData(key) {
+      try {
+        return uni.getStorageSync(key);
+      } catch (error) {
+        return null;
+      }
+    },
+    
+    forceShowAll() {
+      // 通过事件通知父组件强制显示所有组件
+      this.$emit('forceShowAll');
       uni.showToast({
-        title: '日志已导出到控制台',
+        title: '已强制显示所有组件',
         icon: 'success'
       });
     },
     
-    // 关闭调试面板
-    closeDebug() {
-      this.showDebug = false;
+    resetRole() {
+      // 重置角色为默认权限
+      const defaultRoles = ['diandan', 'zhuotai', 'jiaohao', 'duizhang'];
+      this.$store.commit('setUserRole', defaultRoles);
+      uni.showToast({
+        title: '角色权限已重置',
+        icon: 'success'
+      });
     },
     
-    // 显示调试面板
-    show() {
-      this.showDebug = true;
-      this.initDebugInfo();
+    refreshPage() {
+      uni.reLaunch({
+        url: '/pages/home/index'
+      });
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .role-debug {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 300px;
-  max-height: 80vh;
-  background: rgba(0, 0, 0, 0.9);
-  border-radius: 8px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
   z-index: 9999;
-  color: #fff;
-  font-size: 12px;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .debug-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .debug-title {
+  font-size: 16px;
   font-weight: bold;
-  font-size: 14px;
+  color: #333;
 }
 
-.debug-close {
+.close-btn {
+  width: 30px;
+  height: 30px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
   font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  padding: 0 5px;
 }
 
 .debug-content {
-  padding: 10px;
-  max-height: 60vh;
+  background: white;
+  border-radius: 8px;
+  max-width: 500px;
+  max-height: 80vh;
   overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .debug-section {
-  margin-bottom: 15px;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
 }
 
 .section-title {
-  display: block;
+  font-size: 14px;
   font-weight: bold;
-  margin-bottom: 5px;
-  color: #4CAF50;
-  font-size: 13px;
+  color: #007bff;
+  margin-bottom: 10px;
+  display: block;
 }
 
-.info-item {
-  margin-bottom: 3px;
-  padding: 2px 0;
+.debug-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 5px 0;
+}
+
+.label {
+  font-size: 13px;
+  color: #666;
+  min-width: 100px;
+}
+
+.value {
+  font-size: 13px;
+  color: #333;
+  font-weight: bold;
+  flex: 1;
+  text-align: right;
   word-break: break-all;
 }
 
 .debug-actions {
-  margin-top: 15px;
+  padding: 15px 20px;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .debug-btn {
-  padding: 8px;
-  background: #4CAF50;
+  padding: 8px 12px;
+  background: #007bff;
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
+  flex: 1;
+  min-width: 120px;
 }
 
-.debug-btn:active {
-  background: #45a049;
+.debug-btn:hover {
+  background: #0056b3;
 }
 </style>
