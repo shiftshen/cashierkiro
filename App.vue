@@ -39,7 +39,10 @@
 			}, ret => {});
 			// #endif
 		},
-		onShow: function() {},
+		onShow: function() {
+			// 应用显示时的处理
+			console.log('App onShow');
+		},
 		onHide: function() {},
 		methods: {
 			getSocket() {

@@ -90,51 +90,11 @@ class CacheManager {
       if (key.includes('store_goods_list_') || 
           key.includes('goods_') || 
           key.includes('category_')) {
-        (function() {
-            try {
-              return (function() {
-            try {
-              return (function() {
-            try {
-              return (function() {
-            try {
-              return (function() {
-            try {
-              return (function() {
-            try {
-              return (function() {
-            try {
-              return uni.removeStorageSync(key)
-            } catch (error) {
-              console.warn('Storage operation failed:', error)
-              return null
-            }
-          })()
-            } catch (error) {
-              console.warn('Storage operation failed:', error)
-              return null
-            }
-          })()
-            } catch (error) {
-              console.warn('Storage operation failed:', error)
-              return null
-            }
-          })()
-            } catch (error) {
-              console.warn('Storage operation failed:', error)
-              return null
-            }
-          })()
-            } catch (error) {
-              console.warn('Storage operation failed:', error)
-              return null
-            }
-          })()
-            } catch (error) {
-              console.warn('Storage operation failed:', error)
-              return null
-            }
-          })()
+        try {
+          uni.removeStorageSync(key)
+        } catch (error) {
+          console.warn('Storage operation failed:', error)
+        }
       }
     })
   }
@@ -156,9 +116,11 @@ class CacheManager {
         })()
     keys.forEach(key => {
       if (key.includes('category_') || key.includes('goods_category')) {
-        (function() {
-            try {
-              return uni.removeStorageSync(key)
+        try {
+          uni.removeStorageSync(key)
+        } catch (error) {
+          console.warn('Storage operation failed:', error)
+        }
       }
     })
   }
@@ -178,9 +140,11 @@ class CacheManager {
         })()
     keys.forEach(key => {
       if (key.includes('table_') || key.includes('desk_')) {
-        (function() {
-            try {
-              return uni.removeStorageSync(key)
+        try {
+          uni.removeStorageSync(key)
+        } catch (error) {
+          console.warn('Storage operation failed:', error)
+        }
       }
     })
   }
@@ -200,9 +164,11 @@ class CacheManager {
         })()
     keys.forEach(key => {
       if (key.includes('member_') || key.includes('user_')) {
-        (function() {
-            try {
-              return uni.removeStorageSync(key)
+        try {
+          uni.removeStorageSync(key)
+        } catch (error) {
+          console.warn('Storage operation failed:', error)
+        }
       }
     })
   }
@@ -229,9 +195,11 @@ class CacheManager {
     
     keys.forEach(key => {
       if (!preserveKeys.includes(key)) {
-        (function() {
-            try {
-              return uni.removeStorageSync(key)
+        try {
+          uni.removeStorageSync(key)
+        } catch (error) {
+          console.warn('Storage operation failed:', error)
+        }
       }
     })
   }
@@ -261,23 +229,7 @@ class CacheManager {
 
     keys.forEach(key => {
       try {
-        const data = (function() {
-            try {
-              return (function() {
-            try {
-              return (function() {
-            try {
-              return uni.getStorageSync(key)
-            } catch (error) {
-              console.warn('Storage operation failed:', error)
-              return null
-            }
-          })()
-            } catch (error) {
-              console.warn('Storage operation failed:', error)
-              return null
-            }
-          })()
+        const data = uni.getStorageSync(key)
         const size = JSON.stringify(data).length
         stats.totalSize += size
 
@@ -353,13 +305,9 @@ class CacheManager {
       
       keys.forEach(key => {
         try {
-          const data = (function() {
-            try {
-              return uni.getStorageSync(key)
+          const data = uni.getStorageSync(key)
           if (data && data.timestamp && (now - data.timestamp > maxAge)) {
-            (function() {
-            try {
-              return uni.removeStorageSync(key)
+            uni.removeStorageSync(key)
             console.log(`🗑️ 清理过期缓存: ${key}`)
           }
         } catch (error) {

@@ -31,7 +31,7 @@
 							</uni-th>
 						</uni-tr>
 						<uni-tr :class="selectItem==item?'isSelect':''" class="bd2 p10 f18"
-							v-for="(item,index) in carList.goodsList" :key="(item,index)[0].id || (item,index)[1]" :key="index" @click="chooseGood(item,index)">
+							v-for="(item,index) in carList.goodsList" :key="item.id || index" @click="chooseGood(item,index)">
 							<uni-td>
 								<view class="f-x-bt">
 									<!-- <u--image v-if="product_show==1||product_show==3" class="mr10" :src="item.img"
@@ -61,7 +61,7 @@
 					</uni-table>
 					<block v-else>
 						<view :class="actgood==item.id?'isSelect':''" class="bd2 p10 f18"
-							v-for="(item,index) in carList.goodsList" :key="(item,index)[0].id || (item,index)[1]" :key="index" @click="chooseGood(item,index)">
+							v-for="(item,index) in carList.goodsList" :key="item.id || index" @click="chooseGood(item,index)">
 							<view class="f-x-bt">
 								<!-- <u--image v-if="product_show==1||product_show==3" class="mr10" :src="item.img" :radius="6"
 									width="60px" height="60px"></u--image> -->
@@ -100,7 +100,7 @@
 											</view>
 											<view class="flex f-w f14 c9"
 												v-if="item.setMealData && item.setMealData.length">
-												<view v-for="(cv,ci) in item.setMealData" :key="(cv,ci)[0].id || (cv,ci)[1]" :key="ci">
+												<view v-for="(cv,ci) in item.setMealData" :key="cv.id || ci">
 													{{cv.name}}*{{cv.num}}
 													<text v-if="cv.attrData && cv.attrData.attr"
 														class="ml10">[{{ cv.attrData.attr }}]</text>
@@ -125,7 +125,7 @@
 								<view class="line f-g-1"></view>
 							</view>
 							<view :class="actgood==item.id?'isSelect':''" class="bd2 p10 f18"
-								v-for="(item,index) in carList.discountsGoods" :key="(item,index)[0].id || (item,index)[1]" :key="index"
+								v-for="(item,index) in carList.discountsGoods" :key="item.id || index"
 								@click="chooseGood(item,index)">
 								<view class="f-x-bt">
 									<view class="f-1">
@@ -171,7 +171,7 @@
 												</view>
 												<view class="flex f-w f14 c9"
 													v-if="item.setMealData && item.setMealData.length">
-													<view v-for="(cv,ci) in item.setMealData" :key="(cv,ci)[0].id || (cv,ci)[1]" :key="ci">
+													<view v-for="(cv,ci) in item.setMealData" :key="cv.id || ci">
 														{{cv.name}}*{{cv.num}}
 														<text v-if="cv.attrData && cv.attrData.attr"
 															class="ml10">[{{ cv.attrData.attr }}]</text>
@@ -205,7 +205,7 @@
 								<view class="line f-g-1"></view>
 							</view>
 							<view :class="actgood==item.id?'isSelect':''" class="bd2 p10 f18"
-								v-for="(item,index) in prentcarList.prentGoods" :key="(item,index)[0].id || (item,index)[1]" :key="index">
+								v-for="(item,index) in prentcarList.prentGoods" :key="item.id || index">
 								<view class="f-x-bt c9">
 									<view class="f-1">
 										<view class="f-bt">
@@ -238,7 +238,7 @@
 												</view>
 												<view class="flex f-w f14 c9"
 													v-if="item.setMealData && item.setMealData.length">
-													<view v-for="(cv,ci) in item.setMealData" :key="(cv,ci)[0].id || (cv,ci)[1]" :key="ci">
+													<view v-for="(cv,ci) in item.setMealData" :key="cv.id || ci">
 														{{cv.name}}*{{cv.num}}
 														<text v-if="cv.attrData && cv.attrData.attr"
 															class="ml10">[{{ cv.attrData.attr }}]</text>

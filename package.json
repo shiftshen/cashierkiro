@@ -4,8 +4,8 @@
   "description": "DAMO CASHIER - uni-app based POS system",
   "main": "main.js",
   "scripts": {
-    "serve": "npx http-server unpackage/dist/build/web -p 8091 -c-1 --cors",
-    "dev": "npx http-server unpackage/dist/build/web -p 8091 -c-1 --cors",
+    "serve": "npx http-server unpackage/dist/build/web -p 8092 -c-1 --cors",
+    "dev": "npx http-server unpackage/dist/build/web -p 8092 -c-1 --cors",
     "start": "npm run serve",
     "serve:source": "npx http-server . -p 8092 -c-1 --cors",
     "build:h5": "echo 'Building H5 production version...' && echo 'Please use HBuilderX to build for production'",
