@@ -11,7 +11,10 @@
     "serve:source": "npx http-server . -p 8092 -c-1 --cors",
     "build:h5": "echo 'Building H5 production version...' && echo 'Please use HBuilderX to build for production'",
     "build:app": "echo 'Building App production version...' && echo 'Please use HBuilderX to build for production'",
-    "optimize": "node scripts/optimize-build.js"
+    "optimize": "node scripts/optimize-build.js",
+    "quality-check": "node scripts/code-quality-check.js",
+    "fix-issues": "node scripts/fix-common-issues.js",
+    "pre-commit": "npm run quality-check && npm run fix-issues"
   },
   "devDependencies": {
     "@dcloudio/types": "^3.4.8",

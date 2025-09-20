@@ -1,112 +1,55 @@
-# Dependencies
+# 依赖文件
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+# 环境配置文件
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Coverage directory used by tools like istanbul
-coverage/
+# 构建输出
+/unpackage/dist/
+/dist/
+/build/
 
-# nyc test coverage
-.nyc_output
-
-# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
-.grunt
-
-# Bower dependency directory (https://bower.io/)
-bower_components
-
-# node-waf configuration
-.lock-wscript
-
-# Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
-
-# Dependency directories
-jspm_packages/
-
-# TypeScript v1 declaration files
-typings/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
-
-# next.js build output
-.next
-
-# nuxt.js build output
-.nuxt
-
-# vuepress build output
-.vuepress/dist
-
-# Serverless directories
-.serverless
-
-# FuseBox cache
-.fusebox/
-
-# DynamoDB Local files
-.dynamodb/
-
-# TernJS port file
-.tern-port
-
-# uni-app specific
-unpackage/dist/dev/
-unpackage/dist/build/app-plus/
-unpackage/dist/build/.automator/
-unpackage/cache/
-unpackage/debug/
-unpackage/release/
-unpackage/resources/
-.hbuilderx/
-*.log
-
-# Keep the built web version
-!unpackage/dist/build/web/
-
-# IDE
+# 编辑器配置
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS generated files
+# 系统文件
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Temporary files
+# 日志文件
+*.log
+logs/
+
+# 临时文件
 *.tmp
 *.temp
+.cache/
+
+# 测试覆盖率
+coverage/
+
+# 调试文件
+.codebuddy/
+
+# HBuilderX
+.hbuilderx/
+
+# 备份文件
+*.bak
+*.backup
+
+# 敏感信息
+secrets/
+private/
+*.key
+*.pem
