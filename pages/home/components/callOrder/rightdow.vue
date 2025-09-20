@@ -43,7 +43,7 @@
 							</view>
 						</view>
 						<view class="mt20">
-							<view class="bd2 mt10 pb10" v-for="(v,i) in form.orderIndex && form.orderIndex.goods">
+							<view class="bd2 mt10 pb10" v-for="(v,i) in form.orderIndex && form.orderIndex.goods" :key="i">
 								<view class="f-bt f18 p-0-10">
 									<view class="flex f-y-c">
 										<u-tag v-if="v.pack" class="mr5" :text="$t('callorder.package')" size="small"

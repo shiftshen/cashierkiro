@@ -152,11 +152,27 @@
 			// #endif
 		},
 		onLoad() {
-
 			uni.setStorageSync('subject_color', '#FDDA34')
+			
+			// 检查登录状态，但在开发环境下不自动跳转
 			let token = uni.getStorageSync('token'),
 				storeId = uni.getStorageSync('storeId'),
 				uniacid = uni.getStorageSync('uniacid');
+			
+			console.log('登录状态检查:', { token: !!token, storeId: !!storeId, uniacid: !!uniacid });
+			
+			// 开发环境下清除可能导致自动跳转的数据
+			// #ifdef H5
+			if (process.env.NODE_ENV === 'development') {
+				console.log('开发环境：清除自动跳转数据，停留在登录页面');
+				// 可选择性清除数据，避免自动跳转
+				// uni.removeStorageSync('token');
+				// uni.removeStorageSync('uniacid');
+				return;
+			}
+			// #endif
+			
+			// 生产环境的自动跳转逻辑
 			if (token && !storeId && !uniacid) {
 				uni.reLaunch({
 					url: '/pages/login/selectStore'

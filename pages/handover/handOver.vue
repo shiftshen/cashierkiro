@@ -174,7 +174,7 @@
 					<view class="mb20">
 						<view class="wei f20 c0">{{$t('handover.discount_statistics')}}</view>
 					</view>
-					<view class="f-bt mb10" v-for="(v,i) in  hdata.contents && hdata.contents.discountTrend">
+					<view class="f-bt mb10" v-for="(v,i) in  hdata.contents && hdata.contents.discountTrend" :key="i">
 						<view class="f-g-1">{{v.name}}</view>
 						<view class="w20 f-g-0">{{v.count}}{{$t('handover.order')}}</view>
 						<view class="w20 f-g-0 f-x-e">฿{{v.money}}</view>

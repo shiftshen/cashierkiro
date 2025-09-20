@@ -6,10 +6,10 @@
 			<view class="" style="flex:3;">
 				<view class="flex ljt-number-row" :style="{height:height+'rpx'}"
 					:class="[(rowIndex==0||theme=='button')?'':'ljt-top-border']"
-					v-for="(row,rowIndex) in keyboardCell">
+					v-for="(row,rowIndex) in keyboardCell" :key="rowIndex">
 					<view :style="{padding:padding,flex:cell.flex?cell.flex:1}" class="ljt-number-cell"
 						:class="[(cellIndex==0||theme=='button')?'':'ljt-left-border',themeCellClass]"
-						v-for="(cell,cellIndex) in row">
+						v-for="(cell,cellIndex) in row" :key="cellIndex">
 						<view class="ljt-number-btn" @click="onCellClick($event,cell.value)"
 							:class="[cell.id||cell.id=='0'?btnActiveClass:'',themeClass]"
 							:style="{backgroundColor:mBtnStyle.backgroundColor}">
