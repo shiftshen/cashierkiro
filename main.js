@@ -20,10 +20,16 @@ Vue.use(uView)
 
 // 全局mixin解决缺失属性和方法问题
 import FallbackMixin from '@/common/mixins/fallback.mixin.js'
+import LinkSafeMixin from '@/common/mixins/link-safe.mixin.js'
 Vue.mixin(FallbackMixin)
+Vue.mixin(LinkSafeMixin)
 
 // 导入消息适配器
 import { sndMsgToHtml, TwoDisplayAdapter, SerialPortAdapter } from '@/common/utils/msg-adapter.js'
+// 导入链接处理器，防止外链顶替WebView
+import { initLinkHandler } from '@/common/utils/link-handler.js'
+// 导入网络安全配置
+import { initNetworkSecurity } from '@/common/utils/network-security.js'
 
 Vue.prototype.beg = request
 Vue.prototype.api = api
@@ -31,6 +37,11 @@ Vue.prototype.$sndMsgToHtml = sndMsgToHtml
 Vue.prototype.$twoDisplay = TwoDisplayAdapter
 Vue.prototype.$serialPort = SerialPortAdapter
 // Vue.component('dLoading',dLoading)
+
+// 初始化链接处理器
+initLinkHandler()
+// 初始化网络安全配置
+initNetworkSecurity()
 
 app.$mount()
 // #endif
