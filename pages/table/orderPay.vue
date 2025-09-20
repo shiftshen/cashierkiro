@@ -277,7 +277,15 @@
 					storeId: this.storeId,
 					orderid: this.id,
 				}
-				plug.sndMsgToHtml(plugdata);
+				try {
+					if (plug && plug.sndMsgToHtml) {
+						plug.sndMsgToHtml(plugdata);
+					} else {
+						console.warn('原生插件 Html5app-TwoDisplay 未加载');
+					}
+				} catch (error) {
+					console.error('调用原生插件失败:', error);
+				}
 				// #endif
 			},
 			async getReasonConfig() {

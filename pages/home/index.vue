@@ -549,13 +549,21 @@
 				
 				if (t > 0) {
 					// #ifdef APP-PLUS
-					plug.sndMsgToHtml({
-						type: 0,
-						eventtype: "refreshadimage",
-						uniacid: uni.getStorageSync('uniacid'),
-						storeId: uni.getStorageSync('storeId'),
-						token: uni.getStorageSync('token')
-					});
+					try {
+						if (plug && plug.sndMsgToHtml) {
+							plug.sndMsgToHtml({
+								type: 0,
+								eventtype: "refreshadimage",
+								uniacid: uni.getStorageSync('uniacid'),
+								storeId: uni.getStorageSync('storeId'),
+								token: uni.getStorageSync('token')
+							});
+						} else {
+							console.warn('原生插件 Html5app-TwoDisplay 未加载');
+						}
+					} catch (error) {
+						console.error('调用原生插件失败:', error);
+					}
 					// #endif
 				}
 				

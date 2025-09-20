@@ -89,6 +89,18 @@
 			}),
 		},
 		methods: {
+			// 添加缺失的 changeType 方法
+			changeType(value) {
+				console.log('配送方式改变:', value);
+				// 当配送方式改变时，重置配送渠道
+				if (value === 1) {
+					// 平台配送
+					this.psform.channel = 1;
+				} else if (value === 2) {
+					// 商家自配送
+					this.psform.channel = 0;
+				}
+			},
 			open(row) {
 				let {
 					deliverySetting
