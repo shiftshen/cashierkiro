@@ -1,4 +1,8 @@
 import { sndMsgToHtml } from '@/common/utils/msg-adapter.js';
+import { getDeviceInfo, printCompatibilityReport, getCurrentPlatform } from '@/common/utils/app-compatibility.js';
+
+// 全局设备检测缓存，避免重复日志
+let globalDeviceKey = '';
 
 export default {
   data() {
@@ -21,6 +25,12 @@ export default {
     
     // 设备类型检测
     this.detectDeviceType();
+    
+    // 只在APP环境下打印一次兼容性报告
+    if (getCurrentPlatform() === 'app' && !window._compatibilityReported) {
+      printCompatibilityReport();
+      window._compatibilityReported = true;
+    }
   },
   methods: {
     /**
@@ -45,7 +55,7 @@ export default {
         
         // 只在设备信息变化时输出日志，避免重复输出
         const deviceKey = `${screenWidth}x${screenHeight}-${platform}`;
-        if (!this._lastDeviceKey || this._lastDeviceKey !== deviceKey) {
+        if (!globalDeviceKey || globalDeviceKey !== deviceKey) {
           console.log('设备类型检测:', { 
             pc: this.pc, 
             pad: this.pad, 
@@ -53,7 +63,7 @@ export default {
             screenHeight, 
             platform 
           });
-          this._lastDeviceKey = deviceKey;
+          globalDeviceKey = deviceKey;
         }
       } catch (error) {
         console.warn('设备类型检测失败:', error);

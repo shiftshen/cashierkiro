@@ -72,19 +72,19 @@
 				<view class="f-bt mt20">
 					<view class="f-g-1 w50" v-if="tjv!=5">
 						<view class="chartsBox1" v-if="tjv==1 && optbox1.subtitle.name>0">
-							<qiun-data-charts type="ring" :opts="optbox1" :chartData="chartData1" />
+							<app-chart type="ring" :opts="optbox1" :chartData="chartData1" title="支付渠道统计" />
 						</view>
 						<view class="chartsBox1" v-else-if="tjv==2">
-							<qiun-data-charts type="pie" :opts="optbox2" :chartData="chartData2" />
+							<app-chart type="pie" :opts="optbox2" :chartData="chartData2" title="费用统计" />
 						</view>
 						<view class="chartsBox1" v-else-if="tjv==3">
-							<qiun-data-charts type="pie" :opts="optbox2" :chartData="chartData3" />
+							<app-chart type="pie" :opts="optbox2" :chartData="chartData3" title="订单统计" />
 						</view>
 						<view class="chartsBox1" v-else-if="tjv==4">
-							<qiun-data-charts type="pie" :opts="optbox2" :chartData="chartData4" />
+							<app-chart type="pie" :opts="optbox2" :chartData="chartData4" title="商品分类统计" />
 						</view>
 						<view class="chartsBox1" v-else-if="tjv==6">
-							<qiun-data-charts type="pie" :opts="optbox2" :chartData="chartData6" />
+							<app-chart type="pie" :opts="optbox2" :chartData="chartData6" title="非营业收入统计" />
 						</view>
 					</view>
 					<view class="f-g-1 w50">
@@ -137,7 +137,7 @@
 							</uni-tr>
 						</uni-table>
 						<view class="charts-box" v-if="tjv==5">
-							<qiun-data-charts type="line" :opts="opts" :chartData="chartData5" />
+							<app-chart type="line" :opts="opts" :chartData="chartData5" title="时段统计" />
 						</view>
 						<uni-table ref="table" border stripe :emptyText="$t('recontion.no_details')" v-if="tjv==6">
 							<uni-tr>
@@ -161,8 +161,12 @@
 </template>
 
 <script>
+	import AppChart from '@/components/common/app-chart.vue'
+	
 	export default ({
-		components: {},
+		components: {
+			AppChart
+		},
 		data() {
 			return {
 				tab: 0,
