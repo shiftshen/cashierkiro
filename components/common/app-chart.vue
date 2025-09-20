@@ -16,15 +16,15 @@
     </view>
     <!-- #endif -->
     
-    <!-- H5环境下使用原始图表组件 -->
+    <!-- H5环境下使用Canvas绘制图表 -->
     <!-- #ifdef H5 -->
-    <qiun-data-charts 
+    <canvas 
       v-if="showChart"
-      :type="type" 
-      :opts="opts" 
-      :chartData="chartData"
-      @getIndex="getIndex"
-    />
+      :canvas-id="canvasId"
+      :id="canvasId"
+      class="chart-canvas"
+      @touchstart="handleTouch"
+    ></canvas>
     <!-- #endif -->
   </view>
 </template>
@@ -52,7 +52,8 @@ export default {
   },
   data() {
     return {
-      showChart: true
+      showChart: true,
+      canvasId: `chart_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     };
   },
   mounted() {

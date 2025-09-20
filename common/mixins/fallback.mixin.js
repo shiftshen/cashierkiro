@@ -26,10 +26,24 @@ export default {
     // 设备类型检测
     this.detectDeviceType();
     
-    // 只在APP环境下打印一次兼容性报告
-    if (getCurrentPlatform() === 'app' && !window._compatibilityReported) {
-      printCompatibilityReport();
-      window._compatibilityReported = true;
+    // 兼容性报告 - 修复APP环境下的window对象问题
+    try {
+      // #ifdef APP-PLUS
+      if (!global._compatibilityReported) {
+        printCompatibilityReport();
+        global._compatibilityReported = true;
+      }
+      // #endif
+      
+      // #ifdef H5
+      if (!window._compatibilityReported) {
+        printCompatibilityReport();
+        window._compatibilityReported = true;
+      }
+      // #endif
+    } catch (e) {
+      // 忽略兼容性检查错误，避免影响正常功能
+      console.log('兼容性检查跳过:', e.message);
     }
   },
   methods: {

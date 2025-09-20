@@ -1,4 +1,6 @@
 import App from './App'
+// 导入UView兼容性修复 - 必须在最早期加载
+import '@/common/utils/uview-app-fix.js'
 import store from './store'
 import request from '@/common/request';
 import api from '@/api';
