@@ -47,7 +47,7 @@
 			</view> -->
 			<view class="f-1">
 				<!-- 调试信息组件 -->
-				<role-debug v-if="showDebug" :current="current" />
+
 				
 				<!-- 主要内容区域 - 修复角色检查逻辑 -->
 				<billing v-if="current==0" ref="billingRef" @openOver="getOpen" />
@@ -78,9 +78,7 @@
 					</view>
 					<view class="warning-actions">
 						<button @click="refreshPage" class="refresh-btn">刷新页面</button>
-						<button @click="showDebug = !showDebug" class="debug-btn">
-							{{ showDebug ? '隐藏' : '显示' }}调试信息
-						</button>
+
 					</view>
 				</view>
 			</view>
@@ -184,9 +182,7 @@
 			// 性能监控组件 (按需加载)
 			PerformanceDashboard: () => import('@/components/performance/performance-dashboard.vue'),
 			
-			// 调试组件
-			RoleDebug: () => import('@/components/debug/role-debug.vue'),
-			
+
 			// 业务组件直接导入
 			billing: () => import('./components/billing.vue'),
 			desk: () => import('./components/desk.vue'),
@@ -268,8 +264,7 @@
 				isMore: false,
 				// 性能监控面板显示状态
 				showPerformanceDashboard: false,
-				// 调试模式
-				showDebug: false,
+
 				isType: false, //打印机
 				isNotice: false, //消息
 				isCenter: false, //个人中心
