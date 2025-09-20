@@ -43,13 +43,18 @@ export default {
         this.pc = false; // APP环境下不是PC
         // #endif
         
-        console.log('设备类型检测:', { 
-          pc: this.pc, 
-          pad: this.pad, 
-          screenWidth, 
-          screenHeight, 
-          platform 
-        });
+        // 只在设备信息变化时输出日志，避免重复输出
+        const deviceKey = `${screenWidth}x${screenHeight}-${platform}`;
+        if (!this._lastDeviceKey || this._lastDeviceKey !== deviceKey) {
+          console.log('设备类型检测:', { 
+            pc: this.pc, 
+            pad: this.pad, 
+            screenWidth, 
+            screenHeight, 
+            platform 
+          });
+          this._lastDeviceKey = deviceKey;
+        }
       } catch (error) {
         console.warn('设备类型检测失败:', error);
         this.pc = false;
