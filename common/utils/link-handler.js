@@ -5,10 +5,19 @@
 
 // 全局拦截外链点击事件
 export function initLinkHandler() {
+  // #ifdef H5
   // 防止重复绑定
-  if (window._linkHandlerInitialized) {
+  if (typeof window !== 'undefined' && window._linkHandlerInitialized) {
     return;
   }
+  // #endif
+  
+  // #ifdef APP-PLUS
+  // APP环境下检查全局标记
+  if (typeof global !== 'undefined' && global._linkHandlerInitialized) {
+    return;
+  }
+  // #endif
   
   document.addEventListener('click', (e) => {
     const a = e.target.closest && e.target.closest('a');
@@ -37,7 +46,18 @@ export function initLinkHandler() {
     }
   }, true);
   
-  window._linkHandlerInitialized = true;
+  // #ifdef H5
+  if (typeof window !== 'undefined') {
+    window._linkHandlerInitialized = true;
+  }
+  // #endif
+  
+  // #ifdef APP-PLUS
+  if (typeof global !== 'undefined') {
+    global._linkHandlerInitialized = true;
+  }
+  // #endif
+  
   console.log('✅ 链接处理器已初始化');
 }
 

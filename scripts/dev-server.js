@@ -294,7 +294,7 @@ const server = http.createServer((req, res) => {
   });
 });
 
-const PORT = 8092;
+const PORT = 8091;
 server.listen(PORT, () => {
   console.log(`🚀 开发服务器启动成功！`);
   console.log(`📱 访问地址: http://localhost:${PORT}`);
