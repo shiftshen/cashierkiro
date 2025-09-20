@@ -100,7 +100,10 @@
 			// Socket连接初始化
 			getSocket() {
 				try {
-					const socket = new Socket();
+					const socketConfig = {
+						url: site.socketUrl || 'wss://www.vdamo.com/ws'
+					};
+					const socket = new Socket(socketConfig);
 					Vue.prototype.$socket = socket;
 					console.log('Socket连接已初始化');
 				} catch (error) {
@@ -140,8 +143,8 @@
 
 <style lang="scss">
 	/* 注意要写在第一行，同时给style标签加入lang="scss"属性 */
-	@import "uview-ui/index.scss";
-	@import url("./common/styles/common.css");
+	@import "uni_modules/uview-ui/index.scss";
+	@import url("./common/styles/index.css");
 	
 	/* 全局样式 */
 	page {

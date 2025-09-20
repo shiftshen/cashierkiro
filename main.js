@@ -15,6 +15,11 @@ const app = new Vue({
 })
 import uView from '@/uni_modules/uview-ui'
 Vue.use(uView)
+
+// 全局mixin解决缺失属性和方法问题
+import FallbackMixin from '@/common/mixins/fallback.mixin.js'
+Vue.mixin(FallbackMixin)
+
 Vue.prototype.beg = request
 Vue.prototype.api = api
 // Vue.component('dLoading',dLoading)

@@ -93,6 +93,7 @@
 		},
 		data() {
 			return {
+				pc: false, // 添加pc属性用于响应式布局
 				isReset: false,
 				current: 0,
 				operat: '',

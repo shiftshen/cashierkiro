@@ -375,7 +375,7 @@
 			// 优化搜索功能 - 使用防抖
 			async setupOptimizedSearch() {
 				try {
-					const optimizer = await import('@/common/main-thread-optimizer.js').then(m => m.default)
+					const optimizer = await import('@/common/utils/optimizer.js').then(m => m.default)
 					this.debouncedSearch = optimizer.createDebouncedSearch(async (keyword) => {
 						this.queryForm.keyword = keyword
 						await this.fetchData()
