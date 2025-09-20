@@ -94,20 +94,27 @@ export default {
       try {
         this.result = '正在获取店铺列表...'
         
+        // 显示当前请求的详细信息
+        const token = uni.getStorageSync('token')
+        const uniacid = uni.getStorageSync('uniacid')
+        const storeId = uni.getStorageSync('storeId')
+        
+        this.result += `\n\n请求信息:\nToken: ${token ? '已设置' : '未设置'}\nUniacId: ${uniacid}\nStoreId: ${storeId}\nAPI端点: ${this.api.storeList}\n\n`
+        
         const res = await this.beg.request({
-          url: '/channel/store',
+          url: this.api.storeList,
           data: {
             pageSize: 999
           }
         })
         
         if (res.code === 200) {
-          this.result = `店铺列表获取成功！\n店铺数量: ${res.data.total}\n店铺信息: ${JSON.stringify(res.data.list, null, 2)}`
+          this.result += `店铺列表获取成功！\n店铺数量: ${res.data.total}\n店铺信息: ${JSON.stringify(res.data.list, null, 2)}`
         } else {
-          this.result = `获取店铺列表失败: ${res.msg}`
+          this.result += `获取店铺列表失败: ${res.msg}\n完整响应: ${JSON.stringify(res, null, 2)}`
         }
       } catch (error) {
-        this.result = `店铺列表错误: ${error.message}`
+        this.result += `店铺列表错误: ${error.message}\n错误详情: ${JSON.stringify(error, null, 2)}`
       }
     },
     

@@ -31,6 +31,12 @@
       }
     },
     {
+      "path": "pages/debug/store-debug",
+      "style": {
+        "navigationBarTitleText": "店铺调试"
+      }
+    },
+    {
       "path": "pages/handover/index",
       "style": {
         "navigationBarTitleText": "收银台"
