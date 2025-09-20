@@ -43,7 +43,15 @@
 				</view>
 			</block>
 			<block v-else>
+				<view :class="list.some(f=>f.spuId==v.id)?'check':''" class="r_item p5" v-for="(v, i) in dataList" :key="v.id || i"
+					@click.stop="handcar({g: v,addwz: 1})">
+>>>>>>> 03dc6cba90afdd4c6737804c03f59c852208851a
+=======
 				<view :class="list.some(f=>f.spuId==v.id)?'check':''" class="r_item p5" v-for="(v, i) in dataList" :key="v.id || i" @click.stop="handcar({g: v,addwz: 1})">
+=======
+				<view :class="list.some(f=>f.spuId==v.id)?'check':''" class="r_item p5" v-for="(v, i) in dataList" :key="v.id || i"
+					@click.stop="handcar({g: v,addwz: 1})">
+>>>>>>> 03dc6cba90afdd4c6737804c03f59c852208851a
 					<view class="flex f18 wordall2">{{v.name}}</view>
 					<view class="labels" v-if="v.discounts && v.discounts.length">
 						<view class="label goodlb" :style="{color:'#FF3131',borderColor:'#FF3131'}"
@@ -188,6 +196,7 @@
 					e.g.spuId = e.g.id
 					this.$emit('handcar', e)
 				}
+			}, 300)
 			},
 			addToCart(e) {
 				e.g.spuId = e.g.id

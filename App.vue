@@ -41,7 +41,14 @@
 			this.initSecondaryDisplay();
 			// #endif
 		},
-		
+		onShow: function() {
+			// 应用显示时的处理
+			console.log('App onShow');
+		},
+		onHide: function() {
+			// 应用隐藏时的处理
+			console.log('App onHide');
+		},
 		methods: {
 			// 初始化设备类型检测
 			initDeviceType() {
@@ -49,36 +56,26 @@
 					success: (res) => {
 						console.log("屏幕尺寸：", res.windowWidth, res.windowHeight);
 						
-						// 重置所有设备类型标志
-						Vue.prototype.phone = false;
-						Vue.prototype.cash = false;
-						Vue.prototype.pad = false;
-						Vue.prototype.pc = false;
-						
-						// 根据屏幕宽度设置设备类型
-						const width = res.windowWidth;
-						if (width > 0 && width <= 500) {
-							Vue.prototype.phone = true;
-						} else if (width > 500 && width <= 1150) {
-							Vue.prototype.pad = true;
-						} else if (width > 1150 && width <= 1500) {
-							Vue.prototype.cash = true;
-						} else if (width > 1500 && width <= 3280) {
-							Vue.prototype.pc = true;
+						// 设备类型判断
+						let deviceType = 'mobile';
+						if (res.windowWidth >= 1024) {
+							deviceType = 'desktop';
+						} else if (res.windowWidth >= 768) {
+							deviceType = 'tablet';
 						}
 						
-						// 设置全局设备信息
-						Vue.prototype.$deviceInfo = {
-							width: width,
+						// 存储设备信息
+						uni.setStorageSync('deviceInfo', {
+							type: deviceType,
+							width: res.windowWidth,
 							height: res.windowHeight,
-							platform: res.platform,
-							system: res.system
-						};
+							platform: res.platform
+						});
+						
+						console.log('设备类型：', deviceType);
 					},
 					fail: (error) => {
-						console.error('获取系统信息失败:', error);
-						// 设置默认值
-						Vue.prototype.pc = true;
+						console.error('获取系统信息失败：', error);
 					}
 				});
 			},
@@ -87,205 +84,86 @@
 			initSecondaryDisplay() {
 				// #ifdef APP-PLUS
 				try {
-					if (plug && site.screenurl) {
-						const url = site.screenurl + "?type=0&lang=" + i18n.locale;
-						plug.showWebUrl({
-							url: url
-						}, (ret) => {
-							console.log('Secondary display result:', ret);
+					if (plug && plug.showSecondaryDisplay) {
+						plug.showSecondaryDisplay({
+							url: '/hybrid/html/web/index.html'
+						}, (result) => {
+							console.log('副屏显示结果：', result);
 						});
 					}
 				} catch (error) {
-					console.warn('Secondary display initialization failed:', error);
-		onShow: function() {
-			// 应用显示时的处理
-			console.log('App onShow');
-		},
-		
-		onHide: function() {
-=======
+					console.warn('副屏初始化失败：', error);
 				}
 				// #endif
 			},
-		
-		onShow: function() {
-			// 应用显示时的处理
-			console.log('App onShow');
-		},
-		
-		onHide: function() {
-=======
-		onShow: function() {
-			// 应用显示时的处理
-			console.log('App onShow');
-		},
-		
-		onHide: function() {
-			// 应用隐藏时的处理
-			console.log('App onHide');
-		},
-		
-		methods: {
+			
 			// Socket连接初始化
 			getSocket() {
 				try {
-					uni.$on('socketInit', this.socketMsg);
-					this.createInnerAudio();
-					
-					// 安全获取存储数据
-					const token = this.safeGetStorage('token');
-					const storeId = this.safeGetStorage('storeId');
-					const uniacid = this.safeGetStorage('uniacid');
-					
-					if (token && storeId && uniacid) {
-						this.socketMsg();
-					}
+					const socket = new Socket();
+					Vue.prototype.$socket = socket;
+					console.log('Socket连接已初始化');
 				} catch (error) {
-					console.error('Socket initialization failed:', error);
+					console.error('Socket初始化失败：', error);
 				}
 			},
 			
-			// 安全的存储获取方法
-			safeGetStorage(key) {
+			// 音频播放（兼容H5和APP）
+			playAudio(audioPath) {
+				// #ifdef H5
 				try {
-					return uni.getStorageSync(key) || null;
-				} catch (error) {
-					console.warn(`Failed to get storage ${key}:`, error);
-					return null;
-				}
-			},
-			
-			// 创建音频上下文
-			createInnerAudio() {
-				try {
-					this.bgAudioMannager = uni.createInnerAudioContext();
-					this.bgAudioMannager.title = '订单提醒';
-					console.log('Audio context created:', this.bgAudioMannager);
-				} catch (error) {
-					console.error('Failed to create audio context:', error);
-					this.bgAudioMannager = null;
-				}
-			},
-			
-			// Socket消息处理
-			socketMsg() {
-				try {
-					const sroot = site.siteroot;
-					if (!sroot) {
-						console.error('Site root not configured');
-						return;
-					}
-					
-					console.log('Site root:', sroot);
-					const wsUrl = sroot.replace(/(https|http)/, 'wss');
-					console.log('WebSocket URL:', wsUrl);
-					
-					const chatConfig = {
-						url: `${wsUrl}/ws`
-					};
-					
-					this.socket = new Socket(chatConfig);
-					this.setupSocketMessageHandler();
-				} catch (error) {
-					console.error('Socket message setup failed:', error);
-				}
-			},
-			
-			// 设置Socket消息处理器
-			setupSocketMessageHandler() {
-				if (!this.socket) return;
-				
-				let voiceNum = 0;
-				const autoText = this.bgAudioMannager;
-				
-				this.socket.onMessage((msg) => {
-					console.log('Socket message received:', msg);
-					
-					try {
-						if (msg.type === 'voice' && msg.msg) {
-							this.handleVoiceMessage(msg.msg, autoText, voiceNum);
-						} else if (msg.type === 'mqttvoice') {
-							console.log('MQTT voice message:', msg);
-						}
-					} catch (error) {
-						console.error('Message handling error:', error);
-					}
-				});
-			},
-			
-			// 处理语音消息
-			handleVoiceMessage(msgData, audioContext, voiceNum) {
-				if (!audioContext || !msgData) return;
-				
-				try {
-					console.log('Processing voice message:', msgData);
-					voiceNum = msgData.num || 1;
-					console.log('Voice play count:', voiceNum);
-					
-					audioContext.src = msgData.voiceUrl;
-					
-					audioContext.onCanplay(() => {
-						if (voiceNum > 0) {
-							voiceNum--;
-							audioContext.play();
-							console.log('Playing audio, remaining plays:', voiceNum);
-						}
-					});
-					
-					audioContext.onEnded(() => {
-						console.log('Audio ended, remaining plays:', voiceNum);
-						if (voiceNum > 0) {
-							audioContext.play();
-							voiceNum--;
-						} else {
-							// H5环境下重新创建音频上下文
-							// #ifdef H5
-							try {
-								audioContext.destroy();
-								this.createInnerAudio();
-							} catch (error) {
-								console.warn('Audio context recreation failed:', error);
-							}
-							// #endif
-						}
-					});
-					
-					audioContext.onError((res) => {
-						console.error('Audio error:', res.errMsg, res.errCode);
+					const audio = new Audio(audioPath);
+					audio.play().catch(error => {
+						console.warn('H5音频播放失败：', error);
 					});
 				} catch (error) {
-					console.error('Voice message handling error:', error);
+					console.warn('H5音频初始化失败：', error);
 				}
+				// #endif
+				
+				// #ifdef APP-PLUS
+				try {
+					const innerAudioContext = uni.createInnerAudioContext();
+					innerAudioContext.src = audioPath;
+					innerAudioContext.play();
+					innerAudioContext.onError((error) => {
+						console.warn('APP音频播放失败：', error);
+					});
+				} catch (error) {
+					console.warn('APP音频初始化失败：', error);
+				}
+				// #endif
 			}
-		},
+		}
 	}
 </script>
 
 <style lang="scss">
-	/*每个页面公共css */
-	@import "@/uni_modules/uview-ui/index.scss";
-	@import "./common/icons/iconfont.css";
-	@import "./common/icon/iconfont.css";
-	@import './common/styles/index.css';
-	@import './common/styles/my.css';
-	@import "./common/styles/media.css";
-
-	$pc: "(min-width: 1500px) and (max-width: 3280px)";
-	$cash: "(min-width: 1150px) and (max-width: 1500px)";
-	$pad: "(min-width: 500px) and (max-width: 1150px)";
-	$phone: "(min-width: 0px) and (max-width: 500px)";
-
+	/* 注意要写在第一行，同时给style标签加入lang="scss"属性 */
+	@import "uview-ui/index.scss";
+	@import url("./common/styles/common.css");
+	
+	/* 全局样式 */
 	page {
-		width: 100%;
-		height: 100vh;
-		max-height: 100vh;
-		box-sizing: border-box;
+		background-color: #f5f5f5;
 	}
-
-	/* #ifdef H5 */
-	uni-page-head {
-		display: none;
+	
+	/* 响应式设计 */
+	@media screen and (max-width: 768px) {
+		.container {
+			padding: 10px;
+		}
 	}
-
-	/* #endif */
+	
+	@media screen and (min-width: 769px) and (max-width: 1024px) {
+		.container {
+			padding: 20px;
+		}
+	}
+	
+	@media screen and (min-width: 1025px) {
+		.container {
+			padding: 30px;
+		}
+	}
 </style>
