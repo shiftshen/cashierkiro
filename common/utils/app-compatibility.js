@@ -142,9 +142,6 @@ export function checkModuleCompatibility() {
   
   if (platform === 'app') {
     // 所有组件已兼容
-        solution: '使用app-chart组件替代'
-      });
-    }
     
     // 检查原生插件
     const requiredPlugins = ['Html5app-TwoDisplay', 'Fvv-UniSerialPort'];
