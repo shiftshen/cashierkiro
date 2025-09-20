@@ -128,7 +128,9 @@
 			}
 		},
 		created() {
-			this.keydown()
+			// #ifdef H5
+			this.keydown();
+			// #endif
 		},
 		computed: {
 			...mapState({
@@ -174,12 +176,20 @@
 			changeTab(e) {
 				this.current = e.index
 			},
-			keydown(e) {
-				document.onkeydown = e => {
-					if (e.keyCode === 13) {
-						this.login()
+			keydown() {
+				// #ifdef H5
+				try {
+					if (typeof document !== 'undefined') {
+						document.onkeydown = (e) => {
+							if (e.keyCode === 13) {
+								this.login();
+							}
+						};
 					}
+				} catch (error) {
+					console.warn('Keyboard event setup failed:', error);
 				}
+				// #endif
 			},
 			auth(e) {
 				if (e) this.setSiteroot(e.domain)
