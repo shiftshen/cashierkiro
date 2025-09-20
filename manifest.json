@@ -89,6 +89,20 @@
             }
         },
         "nativePlugins" : {
+            "Html5app-TwoDisplay" : {
+                "__plugin_info__" : {
+                    "name" : "Html5app-TwoDisplay",
+                    "description" : "Dual display support",
+                    "platforms" : "Android",
+                    "url" : "",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : false,
+                    "bought" : -1,
+                    "pid" : "",
+                    "parameters" : {}
+                }
+            },
             "Fvv-UniSerialPort" : {
                 "__plugin_info__" : {
                     "name" : "UniSerialPort",

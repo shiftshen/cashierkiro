@@ -20,8 +20,14 @@ Vue.use(uView)
 import FallbackMixin from '@/common/mixins/fallback.mixin.js'
 Vue.mixin(FallbackMixin)
 
+// 导入消息适配器
+import { sndMsgToHtml, TwoDisplayAdapter, SerialPortAdapter } from '@/common/utils/msg-adapter.js'
+
 Vue.prototype.beg = request
 Vue.prototype.api = api
+Vue.prototype.$sndMsgToHtml = sndMsgToHtml
+Vue.prototype.$twoDisplay = TwoDisplayAdapter
+Vue.prototype.$serialPort = SerialPortAdapter
 // Vue.component('dLoading',dLoading)
 
 app.$mount()

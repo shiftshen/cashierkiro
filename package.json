@@ -21,6 +21,7 @@
     "@dcloudio/webpack-uni-mp-loader": "^3.0.0-4020920240930001",
     "@dcloudio/webpack-uni-pages-loader": "^3.0.0-4020920240930001",
     "http-server": "^14.1.1",
+    "postcss-px-to-viewport-8-plugin": "^1.2.5",
     "sass": "^1.64.2",
     "webpack": "^5.101.3",
     "webpack-cli": "^6.0.1",

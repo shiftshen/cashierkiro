@@ -20,9 +20,9 @@ module.exports = {
 			overrideBrowserslist: ['Android >= 4', 'ios >= 8'],
 			remove: process.env.UNI_PLATFORM !== 'h5'
 		},
-		// 借助postcss-px-to-viewport插件，实现rpx转px，文档：https://github.com/evrone/postcss-px-to-viewport/blob/master/README_CN.md
+		// 借助postcss-px-to-viewport-8-plugin插件，实现rpx转px，文档：https://github.com/evrone/postcss-px-to-viewport/blob/master/README_CN.md
 		// 以下配置，可以将rpx转换为1/2的px，如20rpx=10px，如果要调整比例，可以调整 viewportWidth 来实现
-		'postcss-px-to-viewport': {
+		'postcss-px-to-viewport-8-plugin': {
 			unitToConvert: 'rpx',
 			viewportWidth: 200,
 			unitPrecision: 5,

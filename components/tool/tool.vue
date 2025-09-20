@@ -1,7 +1,7 @@
 <template>
 	<view class="dfa">
-		<u-icon v-if="ltype==0" @click="openlanguage" size="15rpx" :name="require('@/static/imgs/language.png')"></u-icon>
-		<u-icon v-else  @click="openlanguage" size="15rpx" :name="require('@/static/imgs/language2.png')"></u-icon>
+		<image v-if="ltype==0" @click="openlanguage" style="width: 15rpx; height: 15rpx;" :src="require('@/static/imgs/language.png')"></image>
+		<image v-else @click="openlanguage" style="width: 15rpx; height: 15rpx;" :src="require('@/static/imgs/language2.png')"></image>
 		<text class="ml30 iconfont icon-lianxi2hebing_dayin" @click="handType" v-if="role.includes('yingjian')"></text>
 		<!-- <text class="ml30 iconfont icon-xiaoxi" @click="handNotice"></text> -->
 		<text class="ml30 iconfont icon-gerenzhongxin-xuanzhong mr10" @click="handCenter"></text>
