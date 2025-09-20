@@ -1,0 +1,111 @@
+{
+  "timestamp": "2025-09-20T17:49:14.241Z",
+  "testResults": [
+    {
+      "timestamp": "2025-09-20T17:49:03.379Z",
+      "type": "info",
+      "message": "🚀 开始自动化测试流程..."
+    },
+    {
+      "timestamp": "2025-09-20T17:49:03.382Z",
+      "type": "info",
+      "message": "⚠️  注意：只进行只读测试，绝对不修改线上数据"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:03.382Z",
+      "type": "info",
+      "message": "测试服务器连接..."
+    },
+    {
+      "timestamp": "2025-09-20T17:49:03.411Z",
+      "type": "success",
+      "message": "服务器连接成功"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:03.412Z",
+      "type": "info",
+      "message": "测试API端点连接..."
+    },
+    {
+      "timestamp": "2025-09-20T17:49:03.550Z",
+      "type": "info",
+      "message": "登录API返回状态码: 200"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:04.552Z",
+      "type": "info",
+      "message": "测试静态资源加载..."
+    },
+    {
+      "timestamp": "2025-09-20T17:49:04.566Z",
+      "type": "success",
+      "message": "资源加载成功: /static/index.883130ca.css"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:05.096Z",
+      "type": "success",
+      "message": "资源加载成功: /manifest.json"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:05.612Z",
+      "type": "success",
+      "message": "资源加载成功: /pages.json"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:06.112Z",
+      "type": "info",
+      "message": "测试页面路由..."
+    },
+    {
+      "timestamp": "2025-09-20T17:49:06.152Z",
+      "type": "success",
+      "message": "路由可访问: /"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:08.187Z",
+      "type": "success",
+      "message": "路由可访问: /#/pages/login/index"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:10.204Z",
+      "type": "success",
+      "message": "路由可访问: /#/pages/login/selectShop"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:12.234Z",
+      "type": "success",
+      "message": "路由可访问: /#/pages/home/index"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:14.236Z",
+      "type": "info",
+      "message": "测试配置文件..."
+    },
+    {
+      "timestamp": "2025-09-20T17:49:14.237Z",
+      "type": "success",
+      "message": "配置文件正确: manifest.json (使用线上数据)"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:14.239Z",
+      "type": "info",
+      "message": "配置文件检查: pages.json"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:14.239Z",
+      "type": "success",
+      "message": "配置文件正确: custom/siteroot.js (使用线上数据)"
+    },
+    {
+      "timestamp": "2025-09-20T17:49:14.241Z",
+      "type": "info",
+      "message": "配置文件检查: common/request.js"
+    }
+  ],
+  "summary": {
+    "total": 20,
+    "success": 10,
+    "errors": 0,
+    "info": 10
+  }
+}
