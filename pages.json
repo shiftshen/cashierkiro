@@ -25,6 +25,12 @@
       }
     },
     {
+      "path": "pages/debug/api-test",
+      "style": {
+        "navigationBarTitleText": "API测试"
+      }
+    },
+    {
       "path": "pages/handover/index",
       "style": {
         "navigationBarTitleText": "收银台"
