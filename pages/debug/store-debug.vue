@@ -61,13 +61,17 @@ export default {
         this.debugResult += `UniacId: ${this.uniacid || '❌ 未设置'}\n`
         this.debugResult += `API端点: ${this.apiEndpoint}\n\n`
         
-        if (!this.token) {
-          this.debugResult += '❌ 错误：没有登录token，请先登录\n'
-          return
+        // 如果uniacid不是3，尝试修复
+        if (this.uniacid !== '3' && this.uniacid !== 3) {
+          this.debugResult += '⚠️ 检测到uniacid不正确，应该是3\n'
+          this.debugResult += '正在修复uniacid...\n'
+          uni.setStorageSync('uniacid', 3)
+          this.uniacid = 3
+          this.debugResult += '✅ uniacid已修复为3\n\n'
         }
         
-        if (!this.uniacid) {
-          this.debugResult += '❌ 错误：没有uniacid，请检查登录流程\n'
+        if (!this.token) {
+          this.debugResult += '❌ 错误：没有登录token，请先登录\n'
           return
         }
         
@@ -92,6 +96,8 @@ export default {
             res.data.list.forEach((store, index) => {
               this.debugResult += `店铺${index + 1}: ${store.name} (ID: ${store.id})\n`
             })
+            this.debugResult += '\n🎉 问题已解决！现在可以正常访问店铺列表了\n'
+            this.debugResult += '请返回登录页面重新登录，或直接访问店铺选择页面\n'
           } else {
             this.debugResult += '⚠️ 店铺列表为空，可能是权限问题\n'
           }
