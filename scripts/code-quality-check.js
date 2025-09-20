@@ -220,7 +220,8 @@ class CodeQualityChecker {
     this.generateReport();
     
     // 返回错误数量，用于CI/CD
-    return grouped.error?.length || 0;
+    const errorCount = this.issues.filter(issue => issue.type === 'error').length;
+    return errorCount;
   }
 }
 
