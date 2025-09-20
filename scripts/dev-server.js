@@ -22,21 +22,75 @@ const mimeTypes = {
   '.wasm': 'application/wasm'
 };
 
+// 生成模拟餐桌数据
+function generateTables() {
+  const tables = [];
+  for (let i = 1; i <= 20; i++) {
+    tables.push({
+      id: i,
+      name: `桌台${i}`,
+      state: Math.floor(Math.random() * 5), // 0-4随机状态
+      people: Math.floor(Math.random() * 6) + 1,
+      scan: Math.random() > 0.5 ? 1 : 0,
+      minutes: Math.floor(Math.random() * 120),
+      type: { max: 8 },
+      order: Math.random() > 0.5 ? { money: (Math.random() * 500 + 50).toFixed(2) } : null
+    });
+  }
+  return tables;
+}
+
+// 生成模拟商品数据
+function generateGoods() {
+  const goods = [];
+  const categories = ['热销', '饮品', '主食', '小食', '甜品'];
+  
+  for (let i = 1; i <= 50; i++) {
+    goods.push({
+      goods: {
+        id: i,
+        name: `商品${i}`,
+        logo: `https://picsum.photos/100/100?random=${i}`,
+        channelIds: [1, 2],
+        specSwitch: 0,
+        singleSpec: {
+          price: (Math.random() * 100 + 10).toFixed(2),
+          inStorePrice: (Math.random() * 100 + 10).toFixed(2),
+          sales: Math.floor(Math.random() * 1000),
+          surplusInventory: Math.floor(Math.random() * 100)
+        },
+        category: [{ name: categories[Math.floor(Math.random() * categories.length)] }],
+        mixPrice: (Math.random() * 50 + 5).toFixed(2),
+        maxPrice: (Math.random() * 150 + 50).toFixed(2),
+        minInStorePrice: (Math.random() * 50 + 5).toFixed(2),
+        maxInStorePrice: (Math.random() * 150 + 50).toFixed(2)
+      },
+      deleted_at: Math.random() > 0.8 ? new Date() : null,
+      selfPriceSwitch: Math.random() > 0.5 ? 1 : 0
+    });
+  }
+  return goods;
+}
+
 // 模拟API数据
 const mockData = {
   '/channel/login': {
     method: 'POST',
     response: {
       code: 200,
-      message: 'success',
+      msg: 'success',
       data: {
-        id: 12,
-        username: 'test002',
-        nickname: 'test002',
-        role_id: 2,
-        mobile: '',
-        token: 'mock_token_' + Date.now(),
-        permissions: ['diandan', 'zhuotai', 'jiaohao', 'dingdan', 'huiyuan', 'tiaozhengyue', 'tiaozhengjifen', 'duizhang']
+        token: 'mock_token_12345',
+        user: {
+          id: 12,
+          username: 'test001',
+          nickname: 'test001',
+          role_id: 2,
+          mobile: '',
+          uniacid: 123,
+          storeId: 1
+        },
+        role: ['diandan', 'zhuotai', 'jiaohao', 'dingdan', 'huiyuan', 'tiaozhengyue', 'tiaozhengjifen', 'duizhang', 'shangxiajia', 'kucun']
       }
     }
   },
@@ -44,11 +98,105 @@ const mockData = {
     method: 'GET',
     response: {
       code: 200,
-      message: 'success',
+      msg: 'success',
       data: {
         status: 'started',
-        shift_id: 1,
-        start_time: new Date().toISOString()
+        time: new Date().toISOString()
+      }
+    }
+  },
+  '/channel/table/area': {
+    method: 'GET',
+    response: {
+      code: 200,
+      msg: 'success',
+      data: {
+        list: [
+          { id: 1, name: '大厅' },
+          { id: 2, name: '包间' },
+          { id: 3, name: '露台' }
+        ]
+      }
+    }
+  },
+  '/channel/inStore/table': {
+    method: 'GET',
+    response: {
+      code: 200,
+      msg: 'success',
+      data: {
+        list: generateTables()
+      }
+    }
+  },
+  '/channel/inStore/table/count': {
+    method: 'GET',
+    response: {
+      code: 200,
+      msg: 'success',
+      data: {
+        allCount: 20,
+        freeCount: 8,
+        orderCount: 5,
+        settleCount: 4,
+        prepareCount: 2,
+        machineCount: 1
+      }
+    }
+  },
+  '/channel/store/goods': {
+    method: 'GET',
+    response: {
+      code: 200,
+      msg: 'success',
+      data: {
+        list: generateGoods(),
+        total: 50
+      }
+    }
+  },
+  '/channel/store/goods/category': {
+    method: 'GET',
+    response: {
+      code: 200,
+      msg: 'success',
+      data: {
+        list: [
+          { value: '', text: '全部' },
+          { value: 1, text: '热销' },
+          { value: 2, text: '饮品' },
+          { value: 3, text: '主食' },
+          { value: 4, text: '小食' },
+          { value: 5, text: '甜品' }
+        ]
+      }
+    }
+  },
+  '/channel/inStore/goods': {
+    method: 'GET',
+    response: {
+      code: 200,
+      msg: 'success',
+      data: {
+        list: generateGoods(),
+        total: 50
+      }
+    }
+  },
+  '/channel/inStore/goods/category': {
+    method: 'GET',
+    response: {
+      code: 200,
+      msg: 'success',
+      data: {
+        list: [
+          { id: '', name: '全部' },
+          { id: 1, name: '热销' },
+          { id: 2, name: '饮品' },
+          { id: 3, name: '主食' },
+          { id: 4, name: '小食' },
+          { id: 5, name: '甜品' }
+        ]
       }
     }
   },
@@ -56,7 +204,7 @@ const mockData = {
     method: 'GET',
     response: {
       code: 200,
-      message: 'success',
+      msg: 'success',
       data: {
         name: 'DAMO CASHIER1',
         version: '1.4.6',
@@ -101,11 +249,11 @@ const server = http.createServer((req, res) => {
           body += chunk.toString();
         });
         req.on('end', () => {
-          console.log(`API请求: ${req.method} ${pathname}`, body ? JSON.parse(body) : '');
+          console.log(`🔗 API请求: ${req.method} ${pathname}`, body ? JSON.parse(body) : '');
           res.end(JSON.stringify(mockApi.response));
         });
       } else {
-        console.log(`API请求: ${req.method} ${pathname}`);
+        console.log(`🔗 API请求: ${req.method} ${pathname}`, parsedUrl.query);
         res.end(JSON.stringify(mockApi.response));
       }
       return;
@@ -150,11 +298,12 @@ const PORT = 8092;
 server.listen(PORT, () => {
   console.log(`🚀 开发服务器启动成功！`);
   console.log(`📱 访问地址: http://localhost:${PORT}`);
-  console.log(`🔧 支持CORS和API模拟`);
+  console.log(`🔧 支持CORS和完整API模拟`);
   console.log(`📋 模拟API端点:`);
   Object.keys(mockData).forEach(endpoint => {
     console.log(`   ${mockData[endpoint].method} ${endpoint}`);
   });
+  console.log(`🎯 现在可以正常显示菜单和餐桌数据了！`);
 });
 
 // 优雅关闭

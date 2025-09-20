@@ -26,8 +26,7 @@ export function isComponentCompatible(componentName) {
   
   // 不兼容APP的组件列表
   const appIncompatibleComponents = [
-    'qiun-data-charts', // 图表组件在APP下有renderjs问题
-    'u-charts', // 原生图表组件
+    // 已移除所有不兼容组件
   ];
   
   if (platform === 'app' && appIncompatibleComponents.includes(componentName)) {
@@ -40,8 +39,7 @@ export function isComponentCompatible(componentName) {
 // 获取组件的替代方案
 export function getComponentFallback(componentName) {
   const fallbacks = {
-    'qiun-data-charts': 'app-chart',
-    'u-charts': 'app-chart'
+    // 统一使用兼容性组件
   };
   
   return fallbacks[componentName] || componentName;
@@ -143,11 +141,7 @@ export function checkModuleCompatibility() {
   const incompatibleModules = [];
   
   if (platform === 'app') {
-    // 检查图表组件
-    if (!isComponentCompatible('qiun-data-charts')) {
-      incompatibleModules.push({
-        name: 'qiun-data-charts',
-        reason: 'renderjs在APP环境下存在兼容性问题',
+    // 所有组件已兼容
         solution: '使用app-chart组件替代'
       });
     }
