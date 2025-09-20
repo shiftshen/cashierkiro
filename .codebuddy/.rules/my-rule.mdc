@@ -1,0 +1,32 @@
+不允许创建无关代码 只在本项目基础上修改
+专注于工作 尽量少废话。
+我配置的和线上数据 不要用本地数据，而且必须是真实数据 不要产生错误的数据和演示数据，测试账号test002 密码123456
+但是禁止修改线上数据
+// 检测运行环境
+const isApp = typeof plus !== 'undefined' || process.env.UNI_PLATFORM === 'app-plus';
+const isDev = process.env.NODE_ENV === 'development';
+
+var site = {
+	version: "1.0",
+	screenurl:"web/index.html#/",//web/index.html#/  http://192.168.1.99:8080/#/
+	// APP和H5使用不同的地址配置
+	siteroot: 'https://www.vdamo.com',
+	socketUrl: 'wss://www.vdamo.com/ws',
+	// 添加环境标识
+	isApp: isApp,
+	isDev: isDev,
+	timeout: isApp ? 10000 : 5000
+}
+
+if (process.env.NODE_ENV !== 'development') {
+	// #ifdef H5
+	  site.siteroot = 'https://www.vdamo.com'
+	  site.socketUrl = 'wss://www.vdamo.com/ws'
+	// #endif
+	console.log('produce')
+} else {
+	console.log('development')
+}
+module.exports = site# my-rule
+
+这是一个规则文件，用于帮助 AI 理解您的代码库和遵循项目约定。
